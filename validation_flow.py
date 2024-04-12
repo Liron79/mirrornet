@@ -28,8 +28,8 @@ if __name__ == "__main__":
     Ro = list()
     for path in data_list:
         R = np.array(load_rays(path))
-        Ri_ = R[:1000, :len(R[0]) // 2] # R[len(R[0]) // 2] # TODO: Dummy Run - Remove it!
-        Ro_ = R[:1000, len(R[0]) // 2:] # R[len(R[0]) // 2:] # TODO: Dummy Run - Remove it!
+        Ri_ = R[:, :len(R[0]) // 2]
+        Ro_ = R[:, len(R[0]) // 2:]
         Ri.extend(Ri_)
         Ro.extend(Ro_)
 

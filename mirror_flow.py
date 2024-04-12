@@ -19,7 +19,6 @@ if __name__ == "__main__":
 
     # 2. load rays in
     Ri = load_rays(path=rays_path)
-    Ri = Ri[:1000] # TODO: Dummy Run - Remove it!
     print(f"Loading Rays Ri (Count={len(Ri)}) from: {rays_path}")
 
     # 3. reflection - generate rays out

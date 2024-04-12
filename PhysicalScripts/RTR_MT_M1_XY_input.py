@@ -131,7 +131,7 @@ def calcRayIntersect(Ri, M1, show_plot:bool = True):
     funcToRun = partial(RT)
     with mp.Pool(processes=num_of_proc) as pool:
         print("num_of_proc:", num_of_proc)
-        M = pool.map(funcToRun, Ri) #TODO to add "SplineParam"
+        M = pool.map(funcToRun, Ri) # TODO to add "SplineParam"
         pool.close()
         Rint.append(M)
     for i in Ri:
