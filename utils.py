@@ -7,7 +7,7 @@ from torch import nn
 import torch.cuda
 
 
-def cuda(tensor: [nn.Module, torch.Tensor]) -> [torch.Tensor, torch.cuda.Tensor]:
+def cuda(tensor: [nn.Module, torch.Tensor]) -> [nn.Module, torch.Tensor]:
     if torch.cuda.is_available():
         return tensor.cuda()
     return tensor
