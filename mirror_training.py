@@ -15,7 +15,6 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 dir_path = os.path.join(base_dir, "PhysicalData")
 data_list = [
     os.path.join(dir_path, "pulse_1x2x1_parabolic.csv"),
-    os.path.join(dir_path, "pulse_1x2x1_parabolic.csv")
 ]
 
 print_every = 5
@@ -37,6 +36,9 @@ if __name__ == "__main__":
         "batch_size": batch_size,
         "lr_start": float(lr),
     }
+
+    if torch.cuda.is_available():
+        print("Training a model with CUDA GPU")
 
     # 2. train a mirror model from the Data
     loss_fn = cuda(MirrorMSELoss())

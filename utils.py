@@ -9,10 +9,7 @@ import torch.cuda
 
 def cuda(tensor: [nn.Module, torch.Tensor]) -> [nn.Module, torch.Tensor]:
     if torch.cuda.is_available():
-        print("Working with CUDA")
         return tensor.cuda()
-
-    print("Working with CPU")
     return tensor
 
 
