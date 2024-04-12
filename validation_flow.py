@@ -75,7 +75,7 @@ if __name__ == "__main__":
     }
     os.makedirs(os.path.join(output_dir, M1_name), exist_ok=True)
     run_key = hashlib.sha1(str(random.getrandbits(256)).encode('utf-8')).hexdigest()[:HASH_SIZE]
-    run_name =  f"{run_key}_{M1_name}"
+    run_name = f"{run_key}_{M1_name}"
     physical_data_pred.to_csv(os.path.join(output_dir, M1_name, f"pred_{run_name}.csv"), index=False)
     new_physical_data_pred.to_csv(os.path.join(output_dir, M1_name, f"{run_name}.csv"), index=False)
     with open(os.path.join(output_dir, M1_name, f"{run_name}.json"), "w+") as f:
