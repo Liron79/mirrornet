@@ -1,10 +1,16 @@
+import hashlib
 import os
 import pickle
+import random
 import numpy as np
 import pandas as pd
 from typing import Tuple
 from torch import nn
 import torch.cuda
+
+
+def gen_hash(size=10):
+    return hashlib.sha1(str(random.getrandbits(256)).encode('utf-8')).hexdigest()[:size]
 
 
 def cuda(tensor: [nn.Module, torch.Tensor]) -> [nn.Module, torch.Tensor]:

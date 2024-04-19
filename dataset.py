@@ -1,16 +1,13 @@
-import random
 import torch
-import hashlib
 import pandas as pd
 from torch.utils.data import Dataset
+from utils import gen_hash
 
 
 class PhysicalDataset(Dataset):
-    HASH_SIZE = 10
 
     def __init__(self, paths: list) -> None:
-        self.name = hashlib.sha1(str(random.getrandbits(256)).encode('utf-8')).hexdigest()
-        self.name = self.name[:PhysicalDataset.HASH_SIZE]
+        self.name = gen_hash()
         self.paths =  paths
         self.data = pd.concat([pd.read_csv(path) for path in paths], axis=0)
         if self.data.empty:

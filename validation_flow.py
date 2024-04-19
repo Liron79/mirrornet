@@ -1,11 +1,9 @@
 import os
-import hashlib
-import random
 import json
 import pandas as pd
 import torch
 import numpy as np
-from utils import load_rays, physical_rays_drop, generate_physical_data, transform
+from utils import load_rays, physical_rays_drop, generate_physical_data, gen_hash, transform
 from PhysicalScripts import RTR_M1_XY_input
 from PhysicalScripts import RTR_M2_YZ_input
 
@@ -13,13 +11,11 @@ from PhysicalScripts import RTR_M2_YZ_input
 base_dir = os.path.dirname(os.path.abspath(__file__))
 dir_path = os.path.join(base_dir, "PhysicalData")
 data_list = [
-    os.path.join(dir_path, "pulse_1x2x1_parabolic.csv")
+    os.path.join(dir_path, "pulse_1x1x1_parabolic.csv")
 ]
-output_dir = os.path.join(dir_path, "Predictions")
-os.makedirs(output_dir, exist_ok=True)
-M1_name = "mirror_898dc3b101"
-M1_dir = os.path.join(base_dir, "Mirrors", M1_name)
-HASH_SIZE = 10
+mirror_dir = "5c3d14b758"
+M1_dir = os.path.join(base_dir, "Mirrors", mirror_dir)
+M1_name = "mirror"
 
 
 if __name__ == "__main__":
@@ -73,13 +69,13 @@ if __name__ == "__main__":
         "num_rays_loss": len(physical_data) - len(physical_data_pred),
         "percentage_rays_loss": 1.0 - (len(physical_data_pred) / len(physical_data))
     }
-    os.makedirs(os.path.join(output_dir, M1_name), exist_ok=True)
-    run_key = hashlib.sha1(str(random.getrandbits(256)).encode('utf-8')).hexdigest()[:HASH_SIZE]
-    run_name = f"{run_key}_{M1_name}"
-    physical_data_pred.to_csv(os.path.join(output_dir, M1_name, f"pred_{run_name}.csv"), index=False)
-    new_physical_data_pred.to_csv(os.path.join(output_dir, M1_name, f"{run_name}.csv"), index=False)
-    with open(os.path.join(output_dir, M1_name, f"{run_name}.json"), "w+") as f:
+    mirror_dir = os.path.join(dir_path, mirror_dir, gen_hash())
+    os.makedirs(mirror_dir, exist_ok=True)
+
+    physical_data_pred.to_csv(os.path.join(mirror_dir, "prediction.csv"), index=False)
+    new_physical_data_pred.to_csv(os.path.join(mirror_dir, "full_data.csv"), index=False)
+    with open(os.path.join(mirror_dir, "metadata.json"), "w+") as f:
         json.dump(metadata, f, indent=4)
 
-    print(f"Prediction results directory: {run_name}")
+    print(f"Prediction results directory: {mirror_dir}")
     print("Done!")

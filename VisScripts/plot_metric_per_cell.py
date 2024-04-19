@@ -2,30 +2,34 @@ import os
 import pandas as pd
 import numpy as np
 from VisScripts.vis_utils import plot_metrics
-from utils import physical_rays_drop
+
+mirror_name = "5c3d14b758"
+data_name = f"07a1c9f03c"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-mirror_name = "mirror_daf5fea5ec"
-dir_path = os.path.join(base_dir, "PhysicalData", "Predictions", mirror_name)
-vis_path = os.path.join(base_dir, "VisData")
-data_name = f"84347c4cf0_{mirror_name}"
-data_path = os.path.join(dir_path, f"{data_name}.csv")
-df = pd.read_csv(data_path)
-df_mirror = df[~df.M.str.contains(mirror_name)]
-df_mirror_pred = df[df.M.str.contains(mirror_name)]
-# df_mirror_pred_filtered = physical_rays_drop()
+dir_path = os.path.join(base_dir, "PhysicalData", mirror_name)
+vis_path = os.path.join(base_dir, "VisData", data_name)
+os.makedirs(vis_path, exist_ok=True)
+data_path = os.path.join(dir_path, data_name, "full_data.csv")
 
-A_MSE = np.zeros((11, 11))
-A_AMP = np.zeros((11, 11))
-A_AMP_PRED = np.zeros((11, 11))
-A_NUM_LOSSES = np.zeros((11, 11))
-A_PERC_LOSSES = np.zeros((11, 11))
+n = 11
+A_MSE = np.zeros((n, n))
+A_AMP = np.zeros((n, n))
+A_AMP_PRED = np.zeros((n, n))
+A_NUM_LOSSES = np.zeros((n, n))
+A_PERC_LOSSES = np.zeros((n, n))
 show = False
 # group by cell
 X_R = range(30, 52, 2)
 Y_R = range(-10, 12, 2)
+
+df = pd.read_csv(data_path)
+df_mirror = df[~df.M.str.contains(mirror_name)]
+df_mirror_pred = df[df.M.str.contains(mirror_name)]
+
 X_range = {x:i for i, x in enumerate(X_R)}
 Y_range = {y:i for i, y in enumerate(Y_R)}
+
 data_df = pd.DataFrame(index=["MSE", "AMP", "AMP_PRED", "NUM_LOSSES", "PERC_LOSSES"])
 for (x, y), grp in df_mirror.groupby(by=["Ri_x", "Ri_y"]):
     grp_pred = df_mirror_pred[(df_mirror_pred.Ri_x == x)&(df_mirror_pred.Ri_y == y)]
@@ -50,16 +54,18 @@ for (x, y), grp in df_mirror.groupby(by=["Ri_x", "Ri_y"]):
                            A_AMP_PRED[x_new, y_new], A_NUM_LOSSES[x_new, y_new],
                            A_PERC_LOSSES[x_new, y_new]]
 
-data_df.to_csv(os.path.join(vis_path, f"{data_name}_DATA_CELL.csv"), index=True)
-
+data_df.to_csv(os.path.join(vis_path, "DATA_CELL.csv"), index=True)
 X_R, Y_R = np.meshgrid(X_R, Y_R)
-plot_metrics(X=X_R, Y=Y_R, Z=A_MSE, path=os.path.join(vis_path, f"{data_name}_MSE_CELL.png"),
+plot_metrics(X=X_R, Y=Y_R, Z=A_MSE, path=os.path.join(vis_path, "MSE_CELL.png"),
              x_label="", y_label="", z_label="", title="", show=show)
-plot_metrics(X=X_R, Y=Y_R, Z=A_AMP, path=os.path.join(vis_path, f"{data_name}_AMP_CELL.png"),
+plot_metrics(X=X_R, Y=Y_R, Z=A_AMP, path=os.path.join(vis_path, "AMP_CELL.png"),
              x_label="", y_label="", z_label="", title="", show=show)
-plot_metrics(X=X_R, Y=Y_R, Z=A_AMP_PRED, path=os.path.join(vis_path, f"{data_name}_AMP_CELL_PRED.png"),
+plot_metrics(X=X_R, Y=Y_R, Z=A_AMP_PRED, path=os.path.join(vis_path, "AMP_CELL_PRED.png"),
              x_label="", y_label="", z_label="", title="", show=show)
-plot_metrics(X=X_R, Y=Y_R, Z=A_NUM_LOSSES, path=os.path.join(vis_path, f"{data_name}_NUM_LOSSES_CELL.png"),
+plot_metrics(X=X_R, Y=Y_R, Z=A_NUM_LOSSES, path=os.path.join(vis_path, "NUM_LOSSES_CELL.png"),
              x_label="", y_label="", z_label="", title="", show=show)
-plot_metrics(X=X_R, Y=Y_R, Z=A_PERC_LOSSES, path=os.path.join(vis_path, f"{data_name}_PERC_LOSSES_CELL.png"),
+plot_metrics(X=X_R, Y=Y_R, Z=A_PERC_LOSSES, path=os.path.join(vis_path, "PERC_LOSSES_CELL.png"),
              x_label="", y_label="", z_label="", title="", show=show)
+
+print(f"Results directory: {vis_path}")
+print("Done!")

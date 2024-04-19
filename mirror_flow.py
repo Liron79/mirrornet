@@ -7,8 +7,11 @@ from PhysicalScripts import RTR_M2_YZ_input
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 M1_name = "parabolic"
+# M1_name = os.path.join("<put the mirror key name>", "mirror")
 M1_dir = os.path.join(base_dir, "Mirrors")
-rays_path = os.path.join(base_dir, "RaysIn", "pulse_1x2x1.csv")
+rays_path = os.path.join(base_dir, "RaysIn", "pulse_1x1x1.csv")
+physical_data_dir = os.path.join(base_dir, "PhysicalData")
+os.makedirs(physical_data_dir, exist_ok=True)
 
 
 if __name__ == "__main__":
@@ -19,6 +22,7 @@ if __name__ == "__main__":
 
     # 2. load rays in
     Ri = load_rays(path=rays_path)
+    Ri = Ri[:1000]
     print(f"Loading Rays Ri (Count={len(Ri)}) from: {rays_path}")
 
     # 3. reflection - generate rays out
@@ -34,7 +38,7 @@ if __name__ == "__main__":
 
     # 4. save rays in, rays out and the mirror to PhysicalData directory
     filename = f"{os.path.basename(rays_path).split('.')[0]}_{os.path.basename(M1_path).split('.')[0]}"
-    physical_data.to_csv(os.path.join(base_dir, "PhysicalData", f"{filename}.csv"), index=False)
+    physical_data.to_csv(os.path.join(physical_data_dir, f"{filename}.csv"), index=False)
 
     # 5. add another mirror
     M2_path = os.path.join(base_dir, "Mirrors", "parabolic.pt")

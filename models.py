@@ -1,14 +1,16 @@
 import torch
 from torch import nn
+from torch.utils.data import DataLoader
+from utils import cuda
 
 
-def mirror_prediction(model: nn.Module, dataloader: torch.utils.data.DataLoader) -> tuple:
+def mirror_prediction(model: nn.Module, dataloader: DataLoader) -> tuple:
     final_x = list()
     final_y = list()
     final_z = list()
     for R, M in iter(dataloader):
         with torch.no_grad():
-            x, y, z = model(R.cuda())
+            x, y, z = model(cuda(R))
             final_x.append(x.detach().cpu())
             final_y.append(y.detach().cpu())
             final_z.append(z.detach().cpu())

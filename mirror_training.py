@@ -12,21 +12,21 @@ from models import MirrorMSELoss, MirrorModel, mirror_prediction
 # python -m pip install torch --index-url https://download.pytorch.org/whl/cu121
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
+mirrors_dir = os.path.join(base_dir, "Mirrors")
+os.makedirs(mirrors_dir, exist_ok=True)
+
 dir_path = os.path.join(base_dir, "PhysicalData")
 data_list = [
-    os.path.join(dir_path, "pulse_1x2x1_parabolic.csv"),
+    os.path.join(dir_path, "pulse_1x1x1_parabolic.csv"),
 ]
 
 print_every = 5
 batch_size = 2
-epochs = 10
+epochs = 2
 lr = 0.01
 
 
 if __name__ == "__main__":
-    mirrors_dir = os.path.join(base_dir, "Mirrors")
-    models_dir = os.path.join(mirrors_dir, "Models")
-
     # 1. load Data from PhysicalData directory
     dataset = PhysicalDataset(paths=data_list)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
@@ -39,6 +39,8 @@ if __name__ == "__main__":
 
     if torch.cuda.is_available():
         print("Training a model with CUDA GPU")
+    else:
+        print("Training a model with CPU")
 
     # 2. train a mirror model from the Data
     loss_fn = cuda(MirrorMSELoss())
@@ -68,21 +70,20 @@ if __name__ == "__main__":
 
     metadata["lr_end"] = float(lr)
 
-    model_name = f"model_{dataset.name}"
-    model_dir = os.path.join(models_dir, model_name)
-    os.makedirs(model_dir, exist_ok=True)
+    mirror_dir = os.path.join(mirrors_dir, dataset.name)
+    os.makedirs(mirror_dir, exist_ok=True)
 
     df = pd.DataFrame(columns=["Epoch_Loss"])
     df.Epoch_Loss = epoch_loss.tolist()
-    df.to_csv(os.path.join(model_dir, "epoch_loss.csv"), index=False)
+    df.to_csv(os.path.join(mirror_dir, "epoch_loss.csv"), index=False)
 
-    with open(os.path.join(model_dir, f"metadata_{dataset.name}.json"), "w+") as f:
+    with open(os.path.join(mirror_dir, "metadata.json"), "w+") as f:
         json.dump(metadata, f, indent=4)
-    torch.save(model.eval().cpu(), os.path.join(model_dir, f"{model_name}.pt"))
+    torch.save(model.eval().cpu(), os.path.join(mirror_dir, "model.pt"))
 
     # 3. generate an averaged mirror and save it to Mirrors directory
     final_M = mirror_prediction(model=cuda(model), dataloader=dataloader)
-    mirror_name = f"mirror_{dataset.name}"
-    mirror_dir = os.path.join(mirrors_dir, mirror_name)
-    os.makedirs(mirror_dir, exist_ok=True)
-    torch.save(final_M, os.path.join(mirror_dir, f"{mirror_name}.pt"))
+    torch.save(final_M, os.path.join(mirror_dir, "mirror.pt"))
+
+    print(f"Model results directory: {mirror_dir}")
+    print("Done!")

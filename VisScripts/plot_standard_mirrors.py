@@ -26,3 +26,5 @@ if show:
     plt.show()
 
 plt.savefig(output_path)
+print(f"Results directory: {output_path}")
+print("Done!")

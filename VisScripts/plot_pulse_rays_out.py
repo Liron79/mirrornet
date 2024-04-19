@@ -9,7 +9,7 @@ pulse_dir_path = os.path.join(base_dir, "PhysicalData")
 vis_dir_path = os.path.join(base_dir, "VisData")
 os.makedirs(vis_dir_path, exist_ok=True)
 
-pulse_name = "pulse_1x2x1_parabolic"
+pulse_name = "pulse_1x1x1_parabolic"
 pulse_path = os.path.join(pulse_dir_path, f"{pulse_name}.csv")
 output_path = os.path.join(vis_dir_path, f"rays_out_{pulse_name}.png")
 show = False
@@ -46,3 +46,5 @@ if show:
     plt.show()
 
 plt.savefig(output_path)
+print(f"Results directory: {output_path}")
+print("Done!")
