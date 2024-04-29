@@ -21,13 +21,13 @@ def mirror_prediction(model: nn.Module, dataloader: DataLoader) -> tuple:
     return final_x.numpy(), final_y.numpy(), final_z.numpy()
 
 
-class MirrorMSELoss(nn.Module):
-    def __init__(self: 'MirrorMSELoss', reduction: str = "mean") -> None:
-        super(MirrorMSELoss, self).__init__()
+class MirrorLoss(nn.Module):
+    def __init__(self: 'MirrorLoss', reduction: str = "mean") -> None:
+        super(MirrorLoss, self).__init__()
         self.reduction = reduction
         self.loss_fn = nn.MSELoss(reduction=reduction)
 
-    def forward(self: 'MirrorMSELoss', Mo: torch.Tensor, M: torch.Tensor) -> torch.Tensor:
+    def forward(self: 'MirrorLoss', Mo: torch.Tensor, M: torch.Tensor) -> torch.Tensor:
         Lx = self.loss_fn(Mo[0], M[0])
         Ly = self.loss_fn(Mo[1], M[1])
         Lz = self.loss_fn(Mo[2], M[2])
@@ -39,10 +39,8 @@ class MirrorModel(nn.Module):
     def __init__(self: 'MirrorModel'):
         super(MirrorModel, self).__init__()
         self.relu = nn.ReLU()
-        self.fc1 = nn.Linear(26, 512, bias=True)
-        self.fc2 = nn.Linear(512, 1024, bias=True)
-        self.fc3 = nn.Linear(1024, 675, bias=True)
-        self.fc4 = nn.Linear(675, 25 + 25 + 625, bias=True)
+        self.fc1 = nn.Linear(26, 256, bias=True)
+        self.fc2 = nn.Linear(256, 25 + 25 + 625, bias=True)
 
     def forward(self: 'MirrorModel', R: torch.Tensor) -> tuple:
         # R = [13 parameters of Ri, 13 parameters of Ro] -> M = [25, 25, 625]
@@ -50,12 +48,6 @@ class MirrorModel(nn.Module):
         Mo = self.relu(Mo)
 
         Mo = self.fc2(Mo)
-        Mo = self.relu(Mo)
-
-        Mo = self.fc3(Mo)
-        Mo = self.relu(Mo)
-
-        Mo = self.fc4(Mo)
 
         x = Mo[:, :25]
         y = Mo[:, 25:50]

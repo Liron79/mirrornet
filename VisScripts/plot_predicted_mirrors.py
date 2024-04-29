@@ -1,17 +1,19 @@
 import os
 import torch
+import os
 import matplotlib.pyplot as plt
 from PhysicalScripts.helper import spline_mirror
 
-mirror_key = "5c3d14b758"
+mirror_key = "1920308aa1"
+mirror_name = "mirror.pt"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 mirror_dir_path = os.path.join(base_dir, "Mirrors")
 vis_dir_path = os.path.join(base_dir, "VisData")
 os.makedirs(vis_dir_path, exist_ok=True)
-show = False
+show = True
 output_path = os.path.join(vis_dir_path, f"{mirror_key}.png")
-X, Y, Z = torch.load(os.path.join(mirror_dir_path, mirror_key, f"mirror.pt"))
+X, Y, Z = torch.load(os.path.join(mirror_dir_path, mirror_key, mirror_name))
 X, Y, Z = spline_mirror(X, Y, Z)
 
 fig = plt.figure(1)

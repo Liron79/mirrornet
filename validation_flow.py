@@ -3,27 +3,37 @@ import json
 import pandas as pd
 import torch
 import numpy as np
-from utils import load_rays, physical_rays_drop, generate_physical_data, gen_hash, transform
-from PhysicalScripts import RTR_M1_XY_input
-from PhysicalScripts import RTR_M2_YZ_input
+
+from dataset import cell_sampling
+from utils import load_rays, physical_rays_drop, generate_physical_data, gen_hash, current_time, load_json, transform
+from PhysicalScripts import RTR_M1_XY_input, RTR_M2_YZ_input
+from PhysicalScripts import RTR_MT_M1_XY_input, RTR_MT_M2_YZ_input
 
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 dir_path = os.path.join(base_dir, "PhysicalData")
-data_list = [
-    os.path.join(dir_path, "pulse_1x1x1_parabolic.csv")
-]
-mirror_dir = "5c3d14b758"
+data_list = load_json("training_cfg.json")["testing_paths"]
+data_list = [os.path.join(dir_path, p) for p in data_list]
+
+mirror_dir = "1920308aa1"
 M1_dir = os.path.join(base_dir, "Mirrors", mirror_dir)
 M1_name = "mirror"
+cell_resolution = 10
 
 
 if __name__ == "__main__":
+    dt_object = current_time()
+    print(f"Validation Flow Start Time = {dt_object}")
+
     # 1. Loading Data from all test files
+    physical_data = list()
     Ri = list()
     Ro = list()
     for path in data_list:
-        R = np.array(load_rays(path))
+        R = pd.read_csv(path)
+        R = cell_sampling(data=R, cell_resolution=cell_resolution)
+        physical_data.append(R)
+        R = R.loc[:, R.columns[1:]].values
         Ri_ = R[:, :len(R[0]) // 2]
         Ro_ = R[:, len(R[0]) // 2:]
         Ri.extend(Ri_)
@@ -36,7 +46,7 @@ if __name__ == "__main__":
 
     # 3. reflection - generate rays out using the predicted mirror
     print("Applying physical reflection of Ri on predicted M1...")
-    _, Ro_pred = RTR_M1_XY_input.calcRayIntersect(Ri, M1, show_plot=False)
+    _, Ro_pred = RTR_MT_M1_XY_input.calcRayIntersect(Ri, M1, show_plot=False)
     Ro_pred = Ro_pred.tolist()
     print("Dropping invalid rays of Ri...")
     Ri_pred = physical_rays_drop(Ri, Ro_pred)
@@ -44,7 +54,7 @@ if __name__ == "__main__":
     physical_data_pred = generate_physical_data(Ri_pred, Ro_pred, M1_path)
     print("Summary table:")
     print(physical_data_pred)
-    physical_data = pd.concat([pd.read_csv(data) for data in data_list], axis=0)
+    physical_data = pd.concat(physical_data, axis=0)
 
     physical_data["SE"] = pd.Series()
     physical_data_pred["SE"] = pd.Series()
@@ -58,7 +68,6 @@ if __name__ == "__main__":
 
     new_physical_data_pred = pd.concat((physical_data, physical_data_pred), axis=0)
     new_physical_data_pred = new_physical_data_pred.sort_values(by="Ro_ray_index")
-    new_physical_data_pred.to_csv()
 
     # 4. save Data out + data analysis
     metadata = {
@@ -71,6 +80,11 @@ if __name__ == "__main__":
     }
     mirror_dir = os.path.join(dir_path, mirror_dir, gen_hash())
     os.makedirs(mirror_dir, exist_ok=True)
+
+    dt_object_end = current_time()
+    print(f"Validation Flow End Time = {dt_object_end}")
+    metadata["validation_time_sec"] = validation_time = (dt_object_end - dt_object).total_seconds()
+    print(f"Validation Flow Duration(sec)= {validation_time}")
 
     physical_data_pred.to_csv(os.path.join(mirror_dir, "prediction.csv"), index=False)
     new_physical_data_pred.to_csv(os.path.join(mirror_dir, "full_data.csv"), index=False)

@@ -10,8 +10,8 @@ os.makedirs(pulse_dir_path, exist_ok=True)
 
 
 n = 1
-pulse_width = 1
-pulse_length = 1
+pulse_width = 2
+pulse_length = 2
 dim_x, dim_y, dim_z = 10, 10, 11
 
 

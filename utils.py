@@ -2,11 +2,20 @@ import hashlib
 import os
 import pickle
 import random
+import json
 import numpy as np
 import pandas as pd
+import torch.cuda
 from typing import Tuple
 from torch import nn
-import torch.cuda
+from datetime import datetime
+
+
+def current_time():
+    now = datetime.now()
+    timestamp = datetime.timestamp(now)
+    dt_object = datetime.fromtimestamp(timestamp)
+    return dt_object
 
 
 def gen_hash(size=10):
@@ -17,6 +26,14 @@ def cuda(tensor: [nn.Module, torch.Tensor]) -> [nn.Module, torch.Tensor]:
     if torch.cuda.is_available():
         return tensor.cuda()
     return tensor
+
+
+def load_json(path: str) -> dict:
+    if path is None or not os.path.exists(path):
+        raise ValueError(f"path={path} is unexpected.")
+    with open(path, "rb") as f:
+        data = json.load(f)
+    return data
 
 
 def load_data(path: str) -> Tuple[np.array, np.array, np.array]:

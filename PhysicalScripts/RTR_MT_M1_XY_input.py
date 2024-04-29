@@ -1,17 +1,23 @@
 import math
 import multiprocessing as mp
-from functools import partial
 from PhysicalScripts.spline import *
 from PhysicalScripts.get_mesh import *
 from datetime import datetime
-from PhysicalScripts.helper import coordinates, find_start, spline_mirror, raydistance
+from PhysicalScripts.helper import coordinates,find_start,spline_mirror,raydistance
 import matplotlib.pyplot as plt
 from PhysicalScripts import spline_calculation
+from utils import current_time
+import os
 
 
 def ray_tracing(x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, status, x, y, m, n, MLm):
+    # !! delete dummy entries
+    # X = np.array([[x0i, y0i, z0i]])
     K = np.array([[kxi, kyi, kzi]])
     E = np.array([[exi, eyi, ezi]])
+    Nx = 0
+    Ny = 0
+    Nz = 0
 
     K = K.transpose()
     E = E.transpose()
@@ -25,15 +31,18 @@ def ray_tracing(x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, status, x, y, m, n
     # tmin = x[0] / K[0]
     # tmax = x[m - 1] / K[0]
     # tmid = (tmax - tmin) / 2 + tmin
-
+    #
     tmin = 0
     tmax = -z0i / K[2]  # check intersection
     tmid = (tmax - tmin) / 2
+
 
     xx, yy, zz = coordinates(x0i, y0i, z0i, kxi,  kyi, kzi, tmid)
     xx = float(xx)
     yy = float(yy)
     zz = float(zz)
+
+
 
     zspl, Nx, Ny, Nz, status = ourspline(xx, yy, x, y, m, n, MLm, 1, status)
     count = 1000
@@ -84,41 +93,52 @@ def ray_tracing(x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, status, x, y, m, n
     TR = sum(N * K)
 
     K = K - 2 * TR * N
-    # E = 2 * (N.dot(E) ) * N - E
+    #E = 2 * (N.dot(E) ) * N - E
     TR = sum(N * E)
     E = 2 * TR * N - E
     return X, K, E, status
 
 
-def RT(myTuple):
-    x0i, y0i, z0i, kxi, kyi, kzi, exi, eyi, ezi, length, amp, status, ray_index, SplineParam = myTuple
-
+def RT(myTuple, SplineParam, result_list, lock):
+    process_id = os.getpid()
+    print("Process", process_id, "is running.")
+    M_final = []
+    Ro = []
     x = SplineParam[0]
     y = SplineParam[1]
     MLm = SplineParam[2]
 
     m = np.size(x)
     n = np.size(y)
+    for i in myTuple:
+        x0i, y0i, z0i, kxi, kyi, kzi, exi, eyi, ezi, length, amp, status, ray_index = i
 
-    # x0i, y0i, z0i = find_start(x, y, m, n, x0i, y0i, z0i, kxi, kyi, kzi, 0, MLm, status)
-    if status == 0:
-        [X, K, E, status] = ray_tracing(x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, status, x, y, m, n, MLm)
-        M = [float(X[0]), float(X[1]), float(X[2]), float(K[0]), float(K[1]), float(K[2]), float(E[0]), float(E[1]),
-             float(E[2]), float(length), float(amp), int(status), int(ray_index)]
-    else:
-        M =[x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, length, amp, status, ray_index]
+        if status == 0:
+            [X, K, E, status] = ray_tracing(x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, status, x, y, m, n, MLm)
+            M = [float(X[0]), float(X[1]), float(X[2]), float(K[0]), float(K[1]), float(K[2]), float(E[0]),
+                     float(E[1]),float(E[2]), float(length), float(amp), int(status), int(ray_index)]
+            L1 = raydistance(x0i, y0i, z0i, M[0], M[1], M[2])
+            M[9] = length + L1
+            M_final.append(M)
+        else:
+            M =[x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, length, amp, status, ray_index]
+            M_final.append(M)
 
-    return M
+        if M[3] != 0:
+            T = -M[0] / M[3]  #  t=-x0/kx (x=0)
+            xx0i, yy0i, zz0i = coordinates(M[0], M[1], M[2], M[3], M[4], M[5], T)
+            L2 = raydistance(M[0], M[1], M[2], xx0i, yy0i, zz0i)
+            Mx = xx0i, yy0i, zz0i, M[3], M[4], M[5], M[6], M[7], M[8], M[9]+L2, amp, status, ray_index
+            Ro.append(Mx) # ray at focal point
+
+    with lock:
+        result_list.append((M_final, Ro))
 
 
 def calcRayIntersect(Ri, M1, show_plot:bool = True):
-    now = datetime.now()
-    timestamp = datetime.timestamp(now)
-    dt_object = datetime.fromtimestamp(timestamp)
+    dt_object = current_time()
     if show_plot:
-        print("Start =", dt_object)
-    plt.figure(1)
-    plt.clf()
+        print("RayTracing of M1 Start Time =", dt_object)
 
     M1x = M1[0]
     M1y = M1[1]
@@ -126,49 +146,41 @@ def calcRayIntersect(Ri, M1, show_plot:bool = True):
     SplineParam = spline_calculation.SplineCalculation_M1(M1x, M1y, M1z)
 
     Rint = []
-    Ro = []
+    Rout = []
+
+    manager = mp.Manager()
+    result_list = manager.list()
+
     num_of_proc = mp.cpu_count()
-    funcToRun = partial(RT)
-    with mp.Pool(processes=num_of_proc) as pool:
-        print("num_of_proc:", num_of_proc)
-        M = pool.map(funcToRun, Ri) # TODO to add "SplineParam"
-        pool.close()
-        Rint.append(M)
-    for i in Ri:
-        x0i = i[0]
-        y0i = i[1]
-        z0i = i[2]
-        kxi = i[3]
-        kyi = i[4]
-        kzi = i[5]
-        exi = i[6]
-        eyi = i[7]
-        ezi = i[8]
-        distance = i[9]
-        amp = i[10]
-        status = int(i[11])
-        ray_index = int(i[12])
+    chunks = list(chunkify(Ri, len(Ri) // num_of_proc))
+    print("num_of_chunks:", len(chunks))
+    pool = mp.Pool(processes=num_of_proc)
+    print("num_of_proc:", num_of_proc)
+    lock = manager.Lock()  # Create a Lock using Manager
+    pool.starmap_async(RT, [(chunk, SplineParam, result_list, lock) for chunk in chunks])
 
-        M = RT(x0i, y0i, z0i, kxi, kyi, kzi, exi, eyi, ezi, distance, amp, status, ray_index, SplineParam)
+    pool.close()
+    pool.join()
 
-        L1 = raydistance(x0i, y0i, z0i, M[0], M[1], M[2])  # calculate raylength start-intersection
-        M[9]= distance + L1
+    for M_final, Ro in result_list:
+        Rint.extend(M_final)
+        Rout.extend(Ro)
 
-        Rint.append(M)
-        if M[3] != 0:
-                T = -M[0] / M[3]  #  t=-x0/kx (x=0)
-                xx0i, yy0i, zz0i = coordinates(M[0], M[1], M[2], M[3], M[4], M[5], T)
-                L2 = raydistance(M[0], M[1], M[2], xx0i, yy0i, zz0i)
-                Mx = xx0i, yy0i, zz0i, M[3], M[4], M[5], M[6], M[7], M[8], M[9]+L2, amp, status, ray_index
-                Ro.append(Mx) # ray at focal point
-
-    now = datetime.now()
-    timestamp = datetime.timestamp(now)
-    dt_object_end = datetime.fromtimestamp(timestamp)
-    print("Finish=", dt_object_end)
-    print("TotalTime = ", dt_object_end - dt_object)
+    dt_object_end = current_time()
+    print("RayTracing of M1 End Time =", dt_object_end)
+    print("RayTracing of M1 Duration =", dt_object_end - dt_object)
 
     if show_plot:
         plt.show()
 
-    return np.array(Rint), np.array(Ro)
+    return np.array(Rint), np.array(Rout)
+
+
+def chunkify(lst, chunk_size):
+    # Split the list into smaller chunks
+    for i in range(0, len(lst), chunk_size):
+        yield lst[i:i + chunk_size]
+
+
+if __name__ == '__main__':
+    calcRayIntersect()
