@@ -14,4 +14,5 @@ def plot_metrics(X: np.array, Y: np.array, Z: np.array, path: str, title: str = 
     ax.yaxis._axinfo['label']['space_factor'] = 3.0
     if show:
         plt.show()
-    plt.savefig(path)
+    else:
+        plt.savefig(path)

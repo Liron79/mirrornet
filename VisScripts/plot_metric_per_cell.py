@@ -4,8 +4,8 @@ import numpy as np
 from VisScripts.vis_utils import plot_metrics
 from dataset import cell_sampling
 
-mirror_name = "1920308aa1"
-validated_dir = "f98c9598ec"
+mirror_name = "049f4b81c7"
+validated_dir = "6bafe57600"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 dir_path = os.path.join(base_dir, "PhysicalData", mirror_name)
@@ -23,7 +23,7 @@ show = False
 # group by cell
 X_R = range(30, 52, 2)
 Y_R = range(-10, 12, 2)
-cell_resolution = 10
+cell_resolution = 50
 
 df = pd.read_csv(data_path)
 df_mirror = df[~df.M.str.contains(mirror_name)]
@@ -36,6 +36,7 @@ data_df = pd.DataFrame(index=["mse", "amp", "amp_pred", "num_losses", "perc_loss
 for (x, y), grp in df_mirror.groupby(by=["Ri_x", "Ri_y"]):
     grp = cell_sampling(data=grp, cell_resolution=cell_resolution)
     grp_pred = df_mirror_pred[(df_mirror_pred.Ri_x == x)&(df_mirror_pred.Ri_y == y)]
+    # grp_pred = cell_sampling(data=grp_pred, cell_resolution=cell_resolution)
     if grp_pred.empty:
         continue
     x_new = X_range[x]
@@ -43,7 +44,7 @@ for (x, y), grp in df_mirror.groupby(by=["Ri_x", "Ri_y"]):
     MSE_xy = (grp.Ro_x.values - grp_pred.Ro_x.values)**2
     MSE_xy += (grp.Ro_y.values - grp_pred.Ro_y.values)**2
     MSE_xy += (grp.Ro_z.values - grp_pred.Ro_z.values)**2
-    A_MSE[x_new, y_new] = MSE_xy.mean()
+    A_MSE[x_new, y_new] = np.sqrt(MSE_xy).mean()
     A_AMP[x_new, y_new] = grp.Ro_amp.sum()
     A_AMP_PRED[x_new, y_new] = grp_pred.Ro_amp.sum()
     uniq_xy = len(set(grp.Ro_ray_index.values))

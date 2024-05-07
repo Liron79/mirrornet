@@ -19,7 +19,7 @@ dir_path = os.path.join(base_dir, "PhysicalData")
 data_list = load_json("training_cfg.json")["training_paths"]
 data_list = [os.path.join(dir_path, p) for p in data_list]
 
-cell_resolution = 10
+cell_resolution = 150
 batch_size = 64
 epochs = 500
 lr = 0.01
@@ -37,7 +37,8 @@ if __name__ == "__main__":
     metadata = {
         "input_paths": data_list,
         "batch_size": batch_size,
-        "lr_start": lr
+        "lr_start": lr,
+        "cell_resolution": cell_resolution
     }
 
     if torch.cuda.is_available():

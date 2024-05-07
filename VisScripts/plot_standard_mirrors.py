@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 from PhysicalScripts.helper import spline_mirror
 
 
-mirror_name = "parabolic"
+mirror_name = "flat"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 mirror_dir_path = os.path.join(base_dir, "Mirrors")
 vis_dir_path = os.path.join(base_dir, "VisData")
 os.makedirs(vis_dir_path, exist_ok=True)
-show = False
+show = True
 output_path = os.path.join(vis_dir_path, f"{mirror_name}.png")
 X, Y, Z = torch.load(os.path.join(mirror_dir_path, f"{mirror_name}.pt"))
 X, Y, Z = spline_mirror(X, Y, Z)
@@ -25,7 +25,7 @@ ax1.set_zlabel('Z')
 ax1.set_title(mirror_name)
 if show:
     plt.show()
-
-plt.savefig(output_path)
+else:
+    plt.savefig(output_path)
 print(f"Results directory: {output_path}")
 print("Done!")

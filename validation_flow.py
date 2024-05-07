@@ -14,11 +14,12 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 dir_path = os.path.join(base_dir, "PhysicalData")
 data_list = load_json("training_cfg.json")["testing_paths"]
 data_list = [os.path.join(dir_path, p) for p in data_list]
+data_list = [data_list[0]] # [0] 1x2x1 | [1] 1x2x2 | [2] 1x6x6
 
-mirror_dir = "1920308aa1"
+mirror_dir = "049f4b81c7"
 M1_dir = os.path.join(base_dir, "Mirrors", mirror_dir)
 M1_name = "mirror"
-cell_resolution = 10
+cell_resolution = 50
 
 
 if __name__ == "__main__":
@@ -72,6 +73,7 @@ if __name__ == "__main__":
     # 4. save Data out + data analysis
     metadata = {
         "data_list": data_list,
+        "cell_resolution": cell_resolution,
         "MSE": physical_data_pred.SE.mean(),
         "num_physical_rays": len(physical_data),
         "num_physical_pred_rays": len(physical_data_pred),

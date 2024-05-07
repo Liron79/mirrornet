@@ -6,8 +6,9 @@ from PhysicalScripts import RTR_MT_M1_XY_input, RTR_MT_M2_YZ_input
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 # M1_name = "parabolic"
+# M1_name = "flat"
 M1_name = "mirror"
-M1_key = "1920308aa1" if M1_name == "mirror" else None
+M1_key = "049f4b81c7" if M1_name == "mirror" else None
 M1_dir = os.path.join(base_dir, "Mirrors")
 rays_path = os.path.join(base_dir, "RaysIn", "pulse_1x6x6.csv")
 physical_data_dir = os.path.join(base_dir, "PhysicalData")

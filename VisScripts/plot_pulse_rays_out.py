@@ -56,7 +56,7 @@ ax.set_ylabel(YAXIS_label, fontsize=13, weight='semibold')
 ax.set_zlabel(ZAXIS_label, fontsize=13, weight='semibold')
 if show:
     plt.show()
-
-plt.savefig(output_path)
+else:
+    plt.savefig(output_path)
 print(f"Results directory: {output_path}")
 print("Done!")

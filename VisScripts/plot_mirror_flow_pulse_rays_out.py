@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-pulse_name = "pulse_1x6x6_parabolic"
-# pulse_name = "pulse_1x6x6_1920308aa1_mirror"
+# pulse_name = "pulse_1x6x6_parabolic"
+pulse_name = "pulse_1x6x6_049f4b81c7_mirror"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 pulse_dir_path = os.path.join(base_dir, "PhysicalData")
@@ -50,7 +50,7 @@ ax.set_ylabel(YAXIS_label, fontsize=13, weight='semibold')
 ax.set_zlabel(ZAXIS_label, fontsize=13, weight='semibold')
 if show:
     plt.show()
-
-plt.savefig(output_path)
+else:
+    plt.savefig(output_path)
 print(f"Results directory: {output_path}")
 print("Done!")
