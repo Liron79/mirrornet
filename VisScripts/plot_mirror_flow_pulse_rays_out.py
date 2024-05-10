@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-# pulse_name = "pulse_1x6x6_parabolic"
-pulse_name = "pulse_1x6x6_049f4b81c7_mirror"
+pulse_name = "pulse_1x6x6_parabolic"
+# pulse_name = "pulse_1x6x6_049f4b81c7_mirror"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 pulse_dir_path = os.path.join(base_dir, "PhysicalData")
@@ -14,7 +14,7 @@ os.makedirs(vis_dir_path, exist_ok=True)
 
 pulse_path = os.path.join(pulse_dir_path, f"{pulse_name}.csv")
 output_path = os.path.join(vis_dir_path, f"rays_out_{pulse_name}.png")
-show = False
+show = True
 XAXIS_label = "Y [mm]"
 YAXIS_label = "Z [mm]"
 area = "[mVs/m]"

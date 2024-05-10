@@ -19,11 +19,11 @@ dir_path = os.path.join(base_dir, "PhysicalData")
 data_list = load_json("training_cfg.json")["training_paths"]
 data_list = [os.path.join(dir_path, p) for p in data_list]
 
-cell_resolution = 150
+cell_resolution = 10
 batch_size = 64
-epochs = 500
+epochs = 100
 lr = 0.01
-checkpoint_rate = 40
+checkpoint_rate = 20
 
 
 if __name__ == "__main__":

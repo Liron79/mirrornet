@@ -12,14 +12,16 @@ from PhysicalScripts import RTR_MT_M1_XY_input, RTR_MT_M2_YZ_input
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 dir_path = os.path.join(base_dir, "PhysicalData")
-data_list = load_json("training_cfg.json")["testing_paths"]
-data_list = [os.path.join(dir_path, p) for p in data_list]
-data_list = [data_list[0]] # [0] 1x2x1 | [1] 1x2x2 | [2] 1x6x6
+# data_path = os.path.join(dir_path, "pulse_1x2x2_parabolic.csv")
+# data_path = os.path.join(dir_path, "pulse_1x3x3_parabolic.csv")
+# data_path = os.path.join(dir_path, "pulse_1x2x1_parabolic.csv")
+data_path = os.path.join(dir_path, "pulse_1x6x6_parabolic.csv")
 
-mirror_dir = "049f4b81c7"
+mirror_dir = "506a202c9f"
 M1_dir = os.path.join(base_dir, "Mirrors", mirror_dir)
+with open(os.path.join(M1_dir, "metadata.json")) as f:
+    cell_resolution = json.load(f)["cell_resolution"]
 M1_name = "mirror"
-cell_resolution = 50
 
 
 if __name__ == "__main__":
@@ -30,15 +32,14 @@ if __name__ == "__main__":
     physical_data = list()
     Ri = list()
     Ro = list()
-    for path in data_list:
-        R = pd.read_csv(path)
-        R = cell_sampling(data=R, cell_resolution=cell_resolution)
-        physical_data.append(R)
-        R = R.loc[:, R.columns[1:]].values
-        Ri_ = R[:, :len(R[0]) // 2]
-        Ro_ = R[:, len(R[0]) // 2:]
-        Ri.extend(Ri_)
-        Ro.extend(Ro_)
+    R = pd.read_csv(data_path)
+    R = cell_sampling(data=R, cell_resolution=cell_resolution)
+    physical_data.append(R)
+    R = R.loc[:, R.columns[1:]].values
+    Ri_ = R[:, :len(R[0]) // 2]
+    Ro_ = R[:, len(R[0]) // 2:]
+    Ri.extend(Ri_)
+    Ro.extend(Ro_)
 
     # 2. Load the predicted mirror
     M1_path = os.path.join(M1_dir, f"{M1_name}.pt")
@@ -72,7 +73,7 @@ if __name__ == "__main__":
 
     # 4. save Data out + data analysis
     metadata = {
-        "data_list": data_list,
+        "data_path": data_path,
         "cell_resolution": cell_resolution,
         "MSE": physical_data_pred.SE.mean(),
         "num_physical_rays": len(physical_data),

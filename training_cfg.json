@@ -1,12 +1,7 @@
 {
   "training_paths": [
-    "pulse_1x1x1_parabolic.csv",
-    "pulse_1x4x3_parabolic.csv",
-    "pulse_1x5x5_parabolic.csv",
-    "pulse_1x2x2_parabolic.csv"
-  ],
-  "testing_paths": [
-    "pulse_1x2x1_parabolic.csv",
-    "pulse_1x6x6_parabolic.csv"
+        "pulse_1x2x2_parabolic.csv",
+        "pulse_1x4x3_parabolic.csv",
+        "pulse_1x5x5_parabolic.csv"
   ]
 }

@@ -39,11 +39,11 @@ class MirrorModel(nn.Module):
     def __init__(self: 'MirrorModel'):
         super(MirrorModel, self).__init__()
         self.relu = nn.ReLU()
-        self.fc1 = nn.Linear(26, 256, bias=True)
+        self.fc1 = nn.Linear(12, 256, bias=True)
         self.fc2 = nn.Linear(256, 25 + 25 + 625, bias=True)
 
     def forward(self: 'MirrorModel', R: torch.Tensor) -> tuple:
-        # R = [13 parameters of Ri, 13 parameters of Ro] -> M = [25, 25, 625]
+        # R = [6 parameters of Ri, 6 parameters of Ro] -> M = [25, 25, 625]
         Mo = self.fc1(R)
         Mo = self.relu(Mo)
 

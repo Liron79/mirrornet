@@ -4,7 +4,7 @@ import os
 import matplotlib.pyplot as plt
 from PhysicalScripts.helper import spline_mirror
 
-mirror_key = "e17b4e4ec6"
+mirror_key = "506a202c9f"
 mirror_name = "mirror.pt"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -4,8 +4,8 @@ import numpy as np
 from VisScripts.vis_utils import plot_metrics
 from dataset import cell_sampling
 
-mirror_name = "049f4b81c7"
-validated_dir = "6bafe57600"
+mirror_name = "506a202c9f"
+validated_dir = "107e4e99ce"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 dir_path = os.path.join(base_dir, "PhysicalData", mirror_name)
@@ -19,11 +19,11 @@ A_AMP = np.zeros((n, n))
 A_AMP_PRED = np.zeros((n, n))
 A_NUM_LOSSES = np.zeros((n, n))
 A_PERC_LOSSES = np.zeros((n, n))
-show = False
+show = True
 # group by cell
 X_R = range(30, 52, 2)
 Y_R = range(-10, 12, 2)
-cell_resolution = 50
+cell_resolution = 10
 
 df = pd.read_csv(data_path)
 df_mirror = df[~df.M.str.contains(mirror_name)]
@@ -34,10 +34,10 @@ Y_range = {y:i for i, y in enumerate(Y_R)}
 
 data_df = pd.DataFrame(index=["mse", "amp", "amp_pred", "num_losses", "perc_losses"])
 for (x, y), grp in df_mirror.groupby(by=["Ri_x", "Ri_y"]):
-    grp = cell_sampling(data=grp, cell_resolution=cell_resolution)
+    # grp = cell_sampling(data=grp, cell_resolution=cell_resolution)
     grp_pred = df_mirror_pred[(df_mirror_pred.Ri_x == x)&(df_mirror_pred.Ri_y == y)]
     # grp_pred = cell_sampling(data=grp_pred, cell_resolution=cell_resolution)
-    if grp_pred.empty:
+    if grp_pred.empty or len(grp_pred) != len(grp):
         continue
     x_new = X_range[x]
     y_new = Y_range[y]
@@ -61,16 +61,10 @@ for (x, y), grp in df_mirror.groupby(by=["Ri_x", "Ri_y"]):
 data_df.to_csv(os.path.join(vis_path, "data_cell.csv"), index=True)
 
 X_R, Y_R = np.meshgrid(X_R, Y_R)
-plot_metrics(X=X_R, Y=Y_R, Z=A_MSE, path=os.path.join(vis_path, "mse_cell.png"),
-             x_label="", y_label="", z_label="", title="", show=show)
 plot_metrics(X=X_R, Y=Y_R, Z=A_AMP, path=os.path.join(vis_path, "amp_cell.png"),
-             x_label="", y_label="", z_label="", title="", show=show)
+             x_label="", y_label="", z_label="", z_factor=1.0, title="", show=show)
 plot_metrics(X=X_R, Y=Y_R, Z=A_AMP_PRED, path=os.path.join(vis_path, "amp_cell_pred.png"),
-             x_label="", y_label="", z_label="", title="", show=show)
-plot_metrics(X=X_R, Y=Y_R, Z=A_NUM_LOSSES, path=os.path.join(vis_path, "num_losses_cell.png"),
-             x_label="", y_label="", z_label="", title="", show=show)
-plot_metrics(X=X_R, Y=Y_R, Z=A_PERC_LOSSES, path=os.path.join(vis_path, "perc_losses_cell.png"),
-             x_label="", y_label="", z_label="", title="", show=show)
+             x_label="", y_label="", z_label="", z_factor=1.0, title="", show=show)
 
 print(f"Results directory: {vis_path}")
 print("Done!")

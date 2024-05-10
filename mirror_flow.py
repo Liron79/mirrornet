@@ -5,12 +5,12 @@ from PhysicalScripts import RTR_M1_XY_input, RTR_M2_YZ_input
 from PhysicalScripts import RTR_MT_M1_XY_input, RTR_MT_M2_YZ_input
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-# M1_name = "parabolic"
+M1_name = "parabolic"
 # M1_name = "flat"
-M1_name = "mirror"
+# M1_name = "mirror"
 M1_key = "049f4b81c7" if M1_name == "mirror" else None
 M1_dir = os.path.join(base_dir, "Mirrors")
-rays_path = os.path.join(base_dir, "RaysIn", "pulse_1x6x6.csv")
+rays_path = os.path.join(base_dir, "RaysIn", "pulse_2x4x4.csv")
 physical_data_dir = os.path.join(base_dir, "PhysicalData")
 os.makedirs(physical_data_dir, exist_ok=True)
 
@@ -34,7 +34,8 @@ if __name__ == "__main__":
 
     # 3. reflection - generate rays out
     print("Applying physical reflection of Ri on M1...")
-    _, Ro = RTR_MT_M1_XY_input.calcRayIntersect(Ri, M, show_plot=False) # TODO:  delete
+    _, Ro = RTR_MT_M1_XY_input.calcRayIntersect(Ri, M, show_plot=False)
+    # _, Ro = RTR_M1_XY_input.calcRayIntersect(Ri, M, show_plot=False) # TODO:  delete
     Ro = Ro.tolist()
     print("Dropping invalid rays of Ri...")
     Ri = physical_rays_drop(Ri, Ro)

@@ -13,6 +13,8 @@ def cell_sampling(data: pd.DataFrame, cell_resolution: int) -> pd.DataFrame:
     for name, grp in data.groupby(by=["M", "Ri_x", "Ri_y", "Ri_z"]):
         # Parallel rays approach
         sampled_grp = grp.sort_values(by=["Ri_kx", "Ri_ky", "Ri_kz"], key=abs).reset_index(drop=True)
+        # parael_rays_cond = (sampled_grp.Ri_kx == 0.0) & (sampled_grp.Ri_ky == 0.0) & (sampled_grp.Ri_kz == -1.0)
+        # sampled_grp = sampled_grp[parael_rays_cond]
         sampled_grp = sampled_grp.iloc[:cell_resolution]
         sampled_data.append(sampled_grp)
     return pd.concat(sampled_data, axis=0)
@@ -40,7 +42,9 @@ class PhysicalDataset(Dataset):
         M = (Mx, My, Mz)
         sep = len(self.sampled_data.columns[1:]) // 2
         Ri = torch.from_numpy(self.sampled_data[self.sampled_data.columns[1:sep + 1]].values)
+        Ri = Ri[:, :6] # x, y, z, kx, ky, kz
         Ro = torch.from_numpy(self.sampled_data[self.sampled_data.columns[sep + 1:]].values)
+        Ro = Ro[:, :6] # x, y, z, kx, ky, kz
         R = torch.cat((Ri, Ro), dim=1).float()[item]
         return R, M
 

@@ -9,8 +9,8 @@ pulse_dir_path = os.path.join(base_dir, "PhysicalData")
 vis_dir_path = os.path.join(base_dir, "VisData")
 os.makedirs(vis_dir_path, exist_ok=True)
 
-mirror_key = "1920308aa1"
-mirror_run_id = "e18bcc165d"
+mirror_key = "049f4b81c7"
+mirror_run_id = "d7ef2874a3"
 rays_out_name = "prediction"
 pulse_name = os.path.join(mirror_key, mirror_run_id, rays_out_name)
 pulse_path = os.path.join(pulse_dir_path, f"{pulse_name}.csv")
