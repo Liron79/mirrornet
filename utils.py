@@ -95,10 +95,16 @@ def transform(Ro: list, kind: str = "linear") -> list:
     for i, ro in enumerate(Ro):
         x, y, z, kx, ky, kz, ex, ey, ez, distance, amp, status, ray_index = ro
         if kind == "linear":
-            x = x + 110 - 40
-            z = 110 + 55 - 40
+            # x = x + 110 - 40
+            # z = 110 + 55 - 40
             kx = kx * -1
             kz = kz * -1
         Ro[i] = [x, y, z, kx, ky, kz, ex, ey, ez, distance, amp, status, ray_index]
 
     return Ro
+
+
+def init_weights(m):
+    if isinstance(m, nn.Linear):
+        torch.nn.init.xavier_uniform_(m.weight)
+        m.bias.data.fill_(0.01)

@@ -5,12 +5,12 @@ from PhysicalScripts import RTR_M1_XY_input, RTR_M2_YZ_input
 from PhysicalScripts import RTR_MT_M1_XY_input, RTR_MT_M2_YZ_input
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-M1_name = "parabolic"
+# M1_name = "parabolic"
 # M1_name = "flat"
-# M1_name = "mirror"
-M1_key = "049f4b81c7" if M1_name == "mirror" else None
+M1_name = "mirror"
+M1_key = "d9f4223526" if M1_name == "mirror" else None
 M1_dir = os.path.join(base_dir, "Mirrors")
-rays_path = os.path.join(base_dir, "RaysIn", "pulse_2x4x4.csv")
+rays_path = os.path.join(base_dir, "RaysIn", "customized_centered_rays.csv")
 physical_data_dir = os.path.join(base_dir, "PhysicalData")
 os.makedirs(physical_data_dir, exist_ok=True)
 
@@ -55,9 +55,11 @@ if __name__ == "__main__":
     print(f"Loading Mirror M2 from: {M2_path}")
     M2 = torch.load(M2_path)
     print(f"Transforming Rays Ro to Ri#2 (Count={len(Ro)})")
-    Ri2 = Ro # transform(Ro, kind="linear") # TODO: Need to be validated mathematically!
+    Ri2 = transform(Ro, kind="linear")
+    # Ri2 = Ro # transform(Ro, kind="linear") # TODO: Need to be validated mathematically!
     print("Applying physical reflection of Ri#2 on M2...")
     _, Ro2 = RTR_MT_M2_YZ_input.calcRayIntersectM2(Ri2, M2, show_plot=False)
+    # _, Ro2 = RTR_M2_YZ_input.calcRayIntersectM2(Ri2, M2, show_plot=False)
     Ro2 = Ro2.tolist()
     print("Dropping invalid rays of Ro#2...")
     Ri2 = physical_rays_drop(Ri2, Ro2)

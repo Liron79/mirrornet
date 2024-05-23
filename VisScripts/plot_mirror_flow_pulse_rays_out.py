@@ -4,8 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-pulse_name = "pulse_1x6x6_parabolic"
-# pulse_name = "pulse_1x6x6_049f4b81c7_mirror"
+# pulse_name = "customized_rays_e8ce93b732_mirror"
+# pulse_name = "customized_7744rays_parabolic"
+pulse_name = "customized_centered_rays_d9f4223526_mirror"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 pulse_dir_path = os.path.join(base_dir, "PhysicalData")
@@ -48,6 +49,7 @@ ax.plot_surface(X, Y, Z_AMP.T, rstride=1, cstride=1, cmap='viridis', edgecolor='
 ax.set_xlabel(XAXIS_label, fontsize=13, weight='semibold')
 ax.set_ylabel(YAXIS_label, fontsize=13, weight='semibold')
 ax.set_zlabel(ZAXIS_label, fontsize=13, weight='semibold')
+ax.set_title(pulse_name)
 if show:
     plt.show()
 else:

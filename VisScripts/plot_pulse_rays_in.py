@@ -12,7 +12,7 @@ os.makedirs(vis_dir_path, exist_ok=True)
 pulse_name = "pulse_1x6x6"
 pulse_path = os.path.join(pulse_dir_path, f"{pulse_name}.csv")
 output_path = os.path.join(vis_dir_path, f"rays_in_{pulse_name}.png")
-show = False
+show = True
 XAXIS_label = "X [mm]"
 YAXIS_label = "Y [mm]"
 area = "[mVs/m]"
@@ -42,6 +42,7 @@ ax.plot_surface(X, Y, Z_AMP.T, rstride=1, cstride=1, cmap='viridis', edgecolor='
 ax.set_xlabel(XAXIS_label, fontsize=13, weight='semibold')
 ax.set_ylabel(YAXIS_label, fontsize=13, weight='semibold')
 ax.set_zlabel(ZAXIS_label, fontsize=13, weight='semibold')
+ax.set_title(pulse_name)
 if show:
     plt.show()
 else:

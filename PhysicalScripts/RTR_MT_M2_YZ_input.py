@@ -1,4 +1,6 @@
 import math
+import multiprocessing as mp
+import os
 from PhysicalScripts.spline import *
 from PhysicalScripts.get_mesh import *
 from datetime import datetime
@@ -6,7 +8,6 @@ from PhysicalScripts.helper import coordinates, find_start, spline_mirror, raydi
 import matplotlib.pyplot as plt
 from PhysicalScripts import spline_calculation, RTR_MT_M1_XY_input
 from utils import current_time
-import multiprocessing as mp
 
 
 def ray_tracing(x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, status, x, y, m, n, MLm):
@@ -74,7 +75,6 @@ def ray_tracing(x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, status, x, y, m, n
         E = np.zeros(3)
         return X, K, E, 1
 
-
     N = [Nx[0], Ny[0], Nz[0]]
     N = np.asarray(N)
     NN = math.sqrt(Nx**2 + Ny**2 + Nz**2)
@@ -91,7 +91,8 @@ def ray_tracing(x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, status, x, y, m, n
 
 
 def RT(myTuple, SplineParam, result_list, lock):
-
+    process_id = os.getpid()
+    print("Process", process_id, "is running.")
     M_final = []
     Ro = []
     x = SplineParam[0]
@@ -103,7 +104,6 @@ def RT(myTuple, SplineParam, result_list, lock):
     for i in myTuple:
         x0i, y0i, z0i, kxi, kyi, kzi, exi, eyi, ezi, length, amp, status, ray_index = i
 
-        # x0i, y0i, z0i = find_start(x, y, m, n, x0i, y0i, z0i, kxi, kyi, kzi, 0, MLm, status)
         if status == 0:
             [X, K, E, status] = ray_tracing(x0i, y0i, z0i, kxi, kyi, kzi, exi, eyi, ezi, status, x, y, m, n, MLm)
             M = [float(X[0]), float(X[1]), float(X[2]), float(K[0]), float(K[1]), float(K[2]), float(E[0]),
@@ -162,4 +162,10 @@ def calcRayIntersectM2(Ri2, M2, show_plot:bool = True):
     if show_plot:
         plt.show()
 
-    return np.array(Rint), np.array(Ro)
+    return np.array(Rint), np.array(Rout)
+
+
+def chunkify(lst, chunk_size):
+    # Split the list into smaller chunks
+    for i in range(0, len(lst), chunk_size):
+        yield lst[i:i + chunk_size]

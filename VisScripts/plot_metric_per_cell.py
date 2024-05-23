@@ -1,13 +1,15 @@
 import os
+import json
 import pandas as pd
 import numpy as np
 from VisScripts.vis_utils import plot_metrics
 from dataset import cell_sampling
 
-mirror_name = "506a202c9f"
-validated_dir = "107e4e99ce"
+mirror_name = "e8ce93b732"
+validated_dir = "ed196b09b9"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+M1_dir = os.path.join(base_dir, "Mirrors", mirror_name)
 dir_path = os.path.join(base_dir, "PhysicalData", mirror_name)
 vis_path = os.path.join(base_dir, "VisData", validated_dir)
 os.makedirs(vis_path, exist_ok=True)
@@ -23,7 +25,8 @@ show = True
 # group by cell
 X_R = range(30, 52, 2)
 Y_R = range(-10, 12, 2)
-cell_resolution = 10
+with open(os.path.join(M1_dir, "metadata.json")) as f:
+    cell_resolution = json.load(f)["cell_resolution"]
 
 df = pd.read_csv(data_path)
 df_mirror = df[~df.M.str.contains(mirror_name)]

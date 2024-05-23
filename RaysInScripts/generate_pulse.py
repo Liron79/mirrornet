@@ -10,8 +10,8 @@ os.makedirs(pulse_dir_path, exist_ok=True)
 
 
 n = 1
-pulse_width = 2
-pulse_length = 2
+pulse_width = 7
+pulse_length = 7
 dim_x, dim_y, dim_z = 10, 10, 11
 
 
@@ -80,6 +80,7 @@ ax = plt.axes(projection='3d')
 ax.plot_surface(X, Y, abs(E*10**6).T, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
 ax.set_xlabel("X [mm]", fontsize=13, weight='semibold')
 ax.set_ylabel("Y [mm]", fontsize=13, weight='semibold')
+ax.set_title(f"pulse_{pulse_N}x{pulse_width}x{pulse_length}")
 area = "[mVs/m]"
 decimals = 2
 ax.set_zlabel("|Ex| {}\u00b2".format(area, decimals), fontsize=13, weight='semibold')
@@ -142,6 +143,7 @@ ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none',
 ax.set_xlabel("X mm", fontsize=13, weight='semibold', rotation=-10)
 ax.set_ylabel("Y mm", fontsize=13, weight='semibold', rotation=45)
 ax.set_zlabel("W [mVs]", fontsize=13, weight='semibold', rotation=90)
+ax.set_title(f"pulse_{pulse_N}x{pulse_width}x{pulse_length}_amp")
 ax.yaxis._axinfo['label']['space_factor'] = 3.0
 plt.show()
 
@@ -190,5 +192,6 @@ ax.plot_surface(X, Y, np.abs(WigX0Y0p).T*10**6, rstride=1, cstride=1, cmap='viri
 ax.set_xlabel("Kx", fontsize=13, weight='semibold', rotation=-10)
 ax.set_ylabel("Ky", fontsize=13, weight='semibold', rotation=45)
 ax.set_zlabel("W [mVs]", fontsize=13, weight='semibold', rotation=90)
+ax.set_title(f"pulse_{pulse_N}x{pulse_width}x{pulse_length}_KxKy")
 ax.yaxis._axinfo['label']['space_factor'] = 3.0
 plt.show()

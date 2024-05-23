@@ -13,14 +13,15 @@ from PhysicalScripts import RTR_MT_M1_XY_input, RTR_MT_M2_YZ_input
 base_dir = os.path.dirname(os.path.abspath(__file__))
 dir_path = os.path.join(base_dir, "PhysicalData")
 # data_path = os.path.join(dir_path, "pulse_1x2x2_parabolic.csv")
-# data_path = os.path.join(dir_path, "pulse_1x3x3_parabolic.csv")
+data_path = os.path.join(dir_path, "pulse_1x3x3_parabolic.csv")
 # data_path = os.path.join(dir_path, "pulse_1x2x1_parabolic.csv")
-data_path = os.path.join(dir_path, "pulse_1x6x6_parabolic.csv")
+# data_path = os.path.join(dir_path, "pulse_1x6x6_ebc16f8bbd_mirror.csv")
 
-mirror_dir = "506a202c9f"
+mirror_dir = "ebc16f8bbd"
 M1_dir = os.path.join(base_dir, "Mirrors", mirror_dir)
-with open(os.path.join(M1_dir, "metadata.json")) as f:
-    cell_resolution = json.load(f)["cell_resolution"]
+# with open(os.path.join(M1_dir, "metadata.json")) as f:
+#     cell_resolution = json.load(f)["cell_resolution"]
+cell_resolution = 200
 M1_name = "mirror"
 
 

@@ -1,5 +1,6 @@
 import math
 import multiprocessing as mp
+import os
 from PhysicalScripts.spline import *
 from PhysicalScripts.get_mesh import *
 from datetime import datetime
@@ -7,17 +8,11 @@ from PhysicalScripts.helper import coordinates,find_start,spline_mirror,raydista
 import matplotlib.pyplot as plt
 from PhysicalScripts import spline_calculation
 from utils import current_time
-import os
 
 
 def ray_tracing(x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, status, x, y, m, n, MLm):
-    # !! delete dummy entries
-    # X = np.array([[x0i, y0i, z0i]])
     K = np.array([[kxi, kyi, kzi]])
     E = np.array([[exi, eyi, ezi]])
-    Nx = 0
-    Ny = 0
-    Nz = 0
 
     K = K.transpose()
     E = E.transpose()
@@ -36,13 +31,10 @@ def ray_tracing(x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, status, x, y, m, n
     tmax = -z0i / K[2]  # check intersection
     tmid = (tmax - tmin) / 2
 
-
     xx, yy, zz = coordinates(x0i, y0i, z0i, kxi,  kyi, kzi, tmid)
     xx = float(xx)
     yy = float(yy)
     zz = float(zz)
-
-
 
     zspl, Nx, Ny, Nz, status = ourspline(xx, yy, x, y, m, n, MLm, 1, status)
     count = 1000
@@ -75,7 +67,6 @@ def ray_tracing(x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, status, x, y, m, n
         K = np.zeros(3)
         E = np.zeros(3)
         return X, K, E, 1
-
 
     spl, Nx, Ny, Nz ,status = ourspline(xx, yy, x, y, m, n, MLm, 0,status)
     if status != 0:
@@ -147,7 +138,6 @@ def calcRayIntersect(Ri, M1, show_plot:bool = True):
 
     Rint = []
     Rout = []
-
     manager = mp.Manager()
     result_list = manager.list()
 
@@ -169,7 +159,6 @@ def calcRayIntersect(Ri, M1, show_plot:bool = True):
     dt_object_end = current_time()
     print("RayTracing of M1 End Time =", dt_object_end)
     print("RayTracing of M1 Duration =", dt_object_end - dt_object)
-
     if show_plot:
         plt.show()
 

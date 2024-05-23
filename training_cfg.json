@@ -1,7 +1,5 @@
 {
   "training_paths": [
-        "pulse_1x2x2_parabolic.csv",
-        "pulse_1x4x3_parabolic.csv",
-        "pulse_1x5x5_parabolic.csv"
+        "customized_centered_rays_parabolic.csv"
   ]
 }

@@ -42,9 +42,9 @@ class PhysicalDataset(Dataset):
         M = (Mx, My, Mz)
         sep = len(self.sampled_data.columns[1:]) // 2
         Ri = torch.from_numpy(self.sampled_data[self.sampled_data.columns[1:sep + 1]].values)
-        Ri = Ri[:, :6] # x, y, z, kx, ky, kz
+        Ri = Ri[:, :3] # x, y, z, kx, ky, kz
         Ro = torch.from_numpy(self.sampled_data[self.sampled_data.columns[sep + 1:]].values)
-        Ro = Ro[:, :6] # x, y, z, kx, ky, kz
+        Ro = Ro[:, :3] # x, y, z, kx, ky, kz
         R = torch.cat((Ri, Ro), dim=1).float()[item]
         return R, M
 
