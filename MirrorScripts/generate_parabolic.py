@@ -34,11 +34,11 @@ if __name__ == "__main__":
 
     M = list()
     for i in range(m):
-        x[i] = (-(m - 1) / 2 + (i)) * x_step + x_offaxis
+        x[i] = (-(m - 1) / 2 + i) * x_step + x_offaxis
     M.append(x)
 
     for j in range(n):
-        y[j] = (-(n - 1) / 2 + (j)) * y_step + y_offaxis
+        y[j] = (-(n - 1) / 2 + j) * y_step + y_offaxis
     M.append(y)
 
     for i in range(m):

@@ -6,6 +6,7 @@ from PhysicalScripts.helper import spline_mirror
 
 mirror_key = "d9f4223526"
 mirror_name = "mirror.pt"
+mirror_title = "Estimated Parabolic"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 mirror_dir_path = os.path.join(base_dir, "Mirrors")
@@ -23,7 +24,7 @@ ax1.plot_surface(X, Y, Z, color="green", alpha=0.5, label="b")
 ax1.set_xlabel('X')
 ax1.set_ylabel('Y')
 ax1.set_zlabel('Z')
-ax1.set_title(mirror_key)
+ax1.set_title(mirror_title)
 if show:
     plt.show()
 else:

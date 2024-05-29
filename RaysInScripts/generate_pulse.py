@@ -157,16 +157,17 @@ fxp = np.fft.fftshift(np.fft.fftfreq(Kxp.shape[0], Kx[1] - Kx[0]))
 fyp = np.fft.fftshift(np.fft.fftfreq(Kyp.shape[0], Ky[1] - Ky[0]))
 raveledfxp, raveledfyp, raveledWigX0Y0p = np.ravel(fxp), np.ravel(fyp), np.ravel(WigX0Y0p)
 X, Y = np.meshgrid(fxp, fyp)
-columns = ["x", "y", "z", "kx", "ky", "kz", "ex", "ey", "ez", "distance", "amp", "status", "ray_index"]
-idx = 1
-X_range = range(30, 52, 2)
-Y_range = range(-10, 12, 2)
-Z_const = 60
-TO_ENERGY = 10**6
+
 pulse_file_path = os.path.join(pulse_dir_path, f"pulse_{pulse_N}x{pulse_width}x{pulse_length}.csv")
 with open(pulse_file_path, "w+", newline="") as f:
+    columns = ["x", "y", "z", "kx", "ky", "kz", "ex", "ey", "ez", "distance", "amp", "status", "ray_index"]
     csv_writer = csv.writer(f, delimiter=",")
     csv_writer.writerow(columns)
+    X_range = range(30, 52, 2)
+    Y_range = range(-10, 12, 2)
+    Z_const = 60
+    TO_ENERGY = 10 ** 6
+    idx = 1
     for ti, i in enumerate(X_range):
         for tj, j in enumerate(Y_range):
             t = Nx * ti + tj

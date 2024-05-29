@@ -4,15 +4,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+pulse_title = "Parallel Rays Input"
+pulse_name = "customized_centered_rays"
+show = True
+
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 pulse_dir_path = os.path.join(base_dir, "RaysIn")
 vis_dir_path = os.path.join(base_dir, "VisData")
 os.makedirs(vis_dir_path, exist_ok=True)
 
-pulse_name = "pulse_1x6x6"
 pulse_path = os.path.join(pulse_dir_path, f"{pulse_name}.csv")
 output_path = os.path.join(vis_dir_path, f"rays_in_{pulse_name}.png")
-show = True
+
 XAXIS_label = "X [mm]"
 YAXIS_label = "Y [mm]"
 area = "[mVs/m]"
@@ -38,11 +41,11 @@ for name, grp in df.groupby(by=BY):
 
 X, Y = np.meshgrid(X_range, Y_range)
 ax = plt.axes(projection='3d')
-ax.plot_surface(X, Y, Z_AMP.T, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
-ax.set_xlabel(XAXIS_label, fontsize=13, weight='semibold')
-ax.set_ylabel(YAXIS_label, fontsize=13, weight='semibold')
-ax.set_zlabel(ZAXIS_label, fontsize=13, weight='semibold')
-ax.set_title(pulse_name)
+ax.plot_surface(X, Y, Z_AMP.T * 1e6, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+ax.set_xlabel(XAXIS_label, fontsize=10, weight='semibold')
+ax.set_ylabel(YAXIS_label, fontsize=10, weight='semibold')
+ax.set_zlabel(ZAXIS_label, fontsize=10, weight='semibold')
+ax.set_title(pulse_title)
 if show:
     plt.show()
 else:

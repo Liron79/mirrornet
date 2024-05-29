@@ -3,8 +3,8 @@ import os
 import json
 import pandas as pd
 import numpy as np
-from utils import cuda, current_time, load_json, gen_hash, init_weights
-from dataset import PhysicalDataset, cell_sampling
+from utils import cuda, current_time, load_json, init_weights
+from dataset import PhysicalDataset
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
 from models import ZMirrorLoss, ZMirrorModel, Zmirror_prediction
@@ -56,9 +56,6 @@ if __name__ == "__main__":
     final_X = None
     final_Y = None
     for e in range(epochs):
-        # Resampling data cells
-        dataloader.dataset.sampled_data = dataloader.dataset.data
-
         batch_loss = list()
         for (R, M) in iter(dataloader):
             Zo = cuda(model(cuda(R)))
@@ -81,7 +78,6 @@ if __name__ == "__main__":
             checkpoint_path = os.path.join(mirrors_dir, dataset.name, "checkpoint", f"{e}")
             os.makedirs(checkpoint_path, exist_ok=True)
             torch.save(model.eval().cpu(), os.path.join(checkpoint_path, "model.pt"))
-            dataloader.dataset.sampled_data = dataloader.dataset.data
             final_Z = Zmirror_prediction(model=cuda(model), dataloader=dataloader)
             final_M = (final_X, final_Y, final_Z)
             torch.save(final_M, os.path.join(checkpoint_path, "mirror.pt"))
@@ -96,7 +92,6 @@ if __name__ == "__main__":
     df.to_csv(os.path.join(mirror_dir, "epoch_loss.csv"), index=False)
 
     # 3. generate an averaged mirror and save it to Mirrors directory
-    dataloader.dataset.sampled_data = dataloader.dataset.data
     final_Z = Zmirror_prediction(model=cuda(model), dataloader=dataloader)
     final_M = (final_X, final_Y, final_Z)
     torch.save(final_M, os.path.join(mirror_dir, "mirror.pt"))

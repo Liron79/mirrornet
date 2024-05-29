@@ -1,5 +1,4 @@
 import torch
-import numpy as np
 import pandas as pd
 from typing import Optional
 from torch.utils.data import Dataset
@@ -27,23 +26,23 @@ class PhysicalDataset(Dataset):
         self.paths = paths
         self.cell_resolution = cell_resolution
         self.data = pd.concat([pd.read_csv(path, nrows=n_rows) for path in paths], axis=0).reset_index(drop=True)
-        self.sampled_data = pd.DataFrame(columns=self.data.columns)
+        # self.sampled_data = pd.DataFrame(columns=self.data.columns)
         if self.data.empty:
             raise ValueError("dataset is empty.")
 
     def __len__(self):
-        return len(self.sampled_data)
+        return len(self.data)
 
     def __getitem__(self: 'PhysicalDataset', item: torch.Tensor) -> [tuple, tuple]:
-        M = [torch.load(M_path) for M_path in [self.sampled_data.M.iloc[item]]]
+        M = [torch.load(M_path) for M_path in [self.data.M.iloc[item]]]
         Mx = torch.cat([torch.tensor(Mx).float() for (Mx, _, _) in M], dim=0)
         My = torch.cat([torch.tensor(My).float() for (_, My, _) in M], dim=0)
         Mz = torch.cat([torch.tensor(Mz).float() for (_, _, Mz) in M], dim=0)
         M = (Mx, My, Mz)
-        sep = len(self.sampled_data.columns[1:]) // 2
-        Ri = torch.from_numpy(self.sampled_data[self.sampled_data.columns[1:sep + 1]].values)
+        sep = len(self.data.columns[1:]) // 2
+        Ri = torch.from_numpy(self.data[self.data.columns[1:sep + 1]].values)
         Ri = Ri[:, :3] # x, y, z, kx, ky, kz
-        Ro = torch.from_numpy(self.sampled_data[self.sampled_data.columns[sep + 1:]].values)
+        Ro = torch.from_numpy(self.data[self.data.columns[sep + 1:]].values)
         Ro = Ro[:, :3] # x, y, z, kx, ky, kz
         R = torch.cat((Ri, Ro), dim=1).float()[item]
         return R, M
