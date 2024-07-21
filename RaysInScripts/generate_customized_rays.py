@@ -5,7 +5,7 @@ import numpy as np
 
 RAND_ANGLES = False
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-raysin_dir_path = os.path.join(base_dir, "RaysIn")
+raysin_dir_path = os.path.join(base_dir, "Storage", "RaysIn")
 os.makedirs(raysin_dir_path, exist_ok=True)
 
 

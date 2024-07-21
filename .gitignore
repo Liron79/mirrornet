@@ -4,3 +4,4 @@ __pycache__
 MirrorModels
 Storage
 venv
+training_cfg.json

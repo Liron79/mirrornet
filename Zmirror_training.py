@@ -11,18 +11,18 @@ from models import ZMirrorLoss, ZMirrorModel, Zmirror_prediction
 
 # python -m pip install torch --index-url https://download.pytorch.org/whl/cu121
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-mirrors_dir = os.path.join(base_dir, "Mirrors")
-os.makedirs(mirrors_dir, exist_ok=True)
-
-dir_path = os.path.join(base_dir, "PhysicalData")
-data_list = load_json("training_cfg.json")["training_paths"]
-data_list = [os.path.join(dir_path, p) for p in data_list]
-
 batch_size = 64
 epochs = 200
 lr = 0.01
 checkpoint_rate = 20
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
+mirrors_dir = os.path.join(base_dir, "MirrorModels")
+os.makedirs(mirrors_dir, exist_ok=True)
+
+dir_path = os.path.join(base_dir, "Storage", "PhysicalData")
+data_list = load_json("training_cfg.json")["training_paths"]
+data_list = [os.path.join(dir_path, p) for p in data_list]
 
 
 if __name__ == "__main__":
@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
         epoch_loss[e] = np.mean(batch_loss)
         if e % 5 == 0:
-            print(f"Epoch={e},LR={lr},Averaged-Loss={epoch_loss[e]}")
+            print(f"Epoch={e}/{epochs},LR={lr},Averaged-Loss={epoch_loss[e]}")
 
         if e % checkpoint_rate == 0:
             checkpoint_path = os.path.join(mirrors_dir, dataset.name, "checkpoint", f"{e}")
@@ -101,8 +101,9 @@ if __name__ == "__main__":
 
     dt_object_end = current_time()
     print("Training End Time =", dt_object_end)
-    metadata["training_time_sec"] = training_time = (dt_object_end - dt_object).total_seconds()
-    print("Training duration (Sec) =", training_time)
+    training_time = (dt_object_end - dt_object).total_seconds() / 3600
+    metadata["training_time_hr"] = training_time
+    print("Training duration (Hours) =", training_time)
 
     with open(os.path.join(mirror_dir, "metadata.json"), "w+") as f:
         json.dump(metadata, f, indent=4)

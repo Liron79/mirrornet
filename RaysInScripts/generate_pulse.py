@@ -5,7 +5,7 @@ import csv
 
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-pulse_dir_path = os.path.join(base_dir, "RaysIn")
+pulse_dir_path = os.path.join(base_dir, "Storage", "RaysIn")
 os.makedirs(pulse_dir_path, exist_ok=True)
 
 

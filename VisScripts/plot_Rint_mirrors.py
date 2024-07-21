@@ -1,16 +1,16 @@
 import pandas as pd
-import torch
 import os
 import matplotlib.pyplot as plt
 from PhysicalScripts.helper import spline_mirror
 
-data_name = "customized_rays_full_parabolic"
+data_name = "<PhysicalData filename>"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-mirror_dir_path = os.path.join(base_dir, "PhysicalData")
-vis_dir_path = os.path.join(base_dir, "VisData")
+mirror_dir_path = os.path.join(base_dir, "Storage", "PhysicalData")
+vis_dir_path = os.path.join(base_dir, "Storage", "VisData")
 os.makedirs(vis_dir_path, exist_ok=True)
 show = True
+
 output_path = os.path.join(vis_dir_path, f"{data_name}.png")
 df = pd.read_csv(os.path.join(mirror_dir_path, f"{data_name}.csv"), usecols=["Rint_x", "Rint_y", "Rint_z"])
 X, Y, Z = spline_mirror(df.Rint_x.unique(), df.Rint_y.unique(), df.Rint_z.values)

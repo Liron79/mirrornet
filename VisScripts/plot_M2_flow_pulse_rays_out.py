@@ -4,13 +4,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-pulse_name = "customized_centered_rays_parabolic_parabolic"
-pulse_title = f"Recover Customized Centered from Parabolic to Parabolic"
+pulse_name = "<PhysicalData filename>"
+pulse_title = "<Title>"
 show = True
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-pulse_dir_path = os.path.join(base_dir, "PhysicalData")
-vis_dir_path = os.path.join(base_dir, "VisData")
+pulse_dir_path = os.path.join(base_dir, "Storage", "PhysicalData")
+vis_dir_path = os.path.join(base_dir, "Storage", "VisData")
 os.makedirs(vis_dir_path, exist_ok=True)
 
 pulse_path = os.path.join(pulse_dir_path, f"{pulse_name}.csv")

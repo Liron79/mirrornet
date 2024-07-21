@@ -27,7 +27,6 @@ class PhysicalDataset(Dataset):
         self.paths = paths
         self.cell_resolution = cell_resolution
         self.data = pd.concat([pd.read_csv(path, nrows=n_rows) for path in paths], axis=0).reset_index(drop=True)
-        # self.sampled_data = pd.DataFrame(columns=self.data.columns)
         if self.data.empty:
             raise ValueError("dataset is empty.")
 
@@ -43,9 +42,7 @@ class PhysicalDataset(Dataset):
         sep = len(self.data.columns[1:]) // 3
         data = self.data.iloc[item].to_frame().T
         Ri = torch.from_numpy(data[data.columns[1:sep + 1]].values.astype(np.float32))[0, ...]
-        # Ri = Ri[:, :3] # x, y, z, kx, ky, kz
         Ro = torch.from_numpy(data[data.columns[sep + 1:sep*2 + 1]].values.astype(np.float32))[0, ...]
-        # Ro = Ro[:, :3] # x, y, z, kx, ky, kz
         Rint = torch.from_numpy(data[data.columns[sep*2 + 1:]].values.astype(np.float32))[0, ...]
         R = torch.cat((Ri, Ro, Rint), dim=0).float()
         return R, Ri, Ro, Rint, M
