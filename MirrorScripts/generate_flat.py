@@ -43,6 +43,9 @@ if __name__ == "__main__":
 
     for i in range(m):
         for j in range(n):
-            z[j+i*n] =(x[i] - 40) / np.sqrt(2) + y[j] / np.sqrt(2) + 15 #quation of plane 45 degree to yx plane passing through point (310 0 155)
+            x_ = (x[i] + y[j]) / np.sqrt(2)
+            y_ = (x[i] - y[j]) / np.sqrt(2)
+            # z[j+i*n] = (x[i] - 40) / np.sqrt(2) + y[j] / np.sqrt(2) + 15 #quation of plane 45 degree to yx plane passing through point (310 0 155)
+            z[j + i * n] = (x_ - 40) / np.sqrt(2) + y_ / np.sqrt(2) + 15
     M.append(z)
     torch.save(M, os.path.join(mirrors_dir_path, f"{mirror_name}.pt"))

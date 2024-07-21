@@ -1,5 +1,6 @@
 {
   "training_paths": [
-        "customized_centered_rays_parabolic.csv"
+    "customized_rays_full_parabolicPFL0.5RFL30.csv",
+    "customized_rays_full_parabolicPFL0.5RFL90.csv"
   ]
 }

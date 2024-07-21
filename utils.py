@@ -70,7 +70,7 @@ def physical_rays_drop(Ri: list, Ro: list) -> list:
     return list(Ri_new)
 
 
-def generate_physical_data(Ri: list, Ro: list, mirror_name: str) -> pd.DataFrame:
+def generate_physical_data(Ri: list, Rint: list, Ro: list, mirror_name: str) -> pd.DataFrame:
     Ri_columns = ["Ri_x", "Ri_y", "Ri_z",
                   "Ri_kx", "Ri_ky", "Ri_kz",
                   "Ri_ex", "Ri_ey", "Ri_ez",
@@ -81,13 +81,20 @@ def generate_physical_data(Ri: list, Ro: list, mirror_name: str) -> pd.DataFrame
                   "Ro_ex", "Ro_ey", "Ro_ez",
                   "Ro_distance", "Ro_amp", "Ro_status",
                   "Ro_ray_index"]
-    data = pd.DataFrame(columns=["M"] + Ri_columns + Ro_columns)
+    Rint_columns = ["Rint_x", "Rint_y", "Rint_z",
+                    "Rint_kx", "Rint_ky", "Rint_kz",
+                    "Rint_ex", "Rint_ey", "Rint_ez",
+                    "Rint_distance", "Rint_amp", "Rint_status",
+                    "Rint_ray_index"]
+    data = pd.DataFrame(columns=["M"] + Ri_columns + Ro_columns + Rint_columns)
     for i in range(len(Ri)):
         if not isinstance(Ri[i], list):
             Ri[i] = Ri[i].tolist()
-        if not isinstance(Ri[i], list):
+        if not isinstance(Ro[i], list):
             Ro[i] = Ro[i].tolist()
-        data.loc[i] = [mirror_name] + Ri[i] + Ro[i]
+        if not isinstance(Rint[i], list):
+            Rint[i] = Rint[i].tolist()
+        data.loc[i] = [mirror_name] + Ri[i] + Ro[i] + Rint[i]
     return data
 
 
@@ -107,4 +114,5 @@ def transform(Ro: list, kind: str = "linear") -> list:
 def init_weights(m):
     if isinstance(m, nn.Linear):
         torch.nn.init.xavier_uniform_(m.weight)
+        # torch.nn.init.kaiming_uniform_(m.weight)
         m.bias.data.fill_(0.01)

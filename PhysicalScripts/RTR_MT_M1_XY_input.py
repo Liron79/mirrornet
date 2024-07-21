@@ -90,7 +90,7 @@ def ray_tracing(x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, status, x, y, m, n
     return X, K, E, status
 
 
-def RT(myTuple, SplineParam, result_list, lock):
+def RT(myTuple, SplineParam, result_list, lock, return_failures: bool = False):
     process_id = os.getpid()
     print("Process", process_id, "is running.")
     M_final = []
@@ -112,21 +112,24 @@ def RT(myTuple, SplineParam, result_list, lock):
             M[9] = length + L1
             M_final.append(M)
         else:
-            M =[x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, length, amp, status, ray_index]
+            M = [x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, length, amp, status, ray_index]
             M_final.append(M)
 
         if M[3] != 0:
             T = -M[0] / M[3]  #  t=-x0/kx (x=0)
             xx0i, yy0i, zz0i = coordinates(M[0], M[1], M[2], M[3], M[4], M[5], T)
             L2 = raydistance(M[0], M[1], M[2], xx0i, yy0i, zz0i)
-            Mx = xx0i, yy0i, zz0i, M[3], M[4], M[5], M[6], M[7], M[8], M[9]+L2, amp, status, ray_index
-            Ro.append(Mx) # ray at focal point
+            Mx = [xx0i, yy0i, zz0i, M[3], M[4], M[5], M[6], M[7], M[8], M[9]+L2, amp, status, ray_index]
+            Ro.append(Mx)  # ray at focal point
+        elif return_failures:
+            Mx = [x0i, y0i, z0i, kxi,  kyi, kzi, exi, eyi, ezi, length, amp, status, ray_index]
+            Ro.append(Mx)
 
     with lock:
         result_list.append((M_final, Ro))
 
 
-def calcRayIntersect(Ri, M1, show_plot:bool = True):
+def calcRayIntersect(Ri, M1, show_plot: bool = True, return_failures: bool = False):
     dt_object = current_time()
     if show_plot:
         print("RayTracing of M1 Start Time =", dt_object)
@@ -147,7 +150,7 @@ def calcRayIntersect(Ri, M1, show_plot:bool = True):
     pool = mp.Pool(processes=num_of_proc)
     print("num_of_proc:", num_of_proc)
     lock = manager.Lock()  # Create a Lock using Manager
-    pool.starmap_async(RT, [(chunk, SplineParam, result_list, lock) for chunk in chunks])
+    pool.starmap_async(RT, [(chunk, SplineParam, result_list, lock, return_failures) for chunk in chunks])
 
     pool.close()
     pool.join()

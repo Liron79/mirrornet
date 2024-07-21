@@ -7,7 +7,7 @@ if __name__ == "__main__":
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     mirrors_dir_path = os.path.join(base_dir, "Mirrors")
     os.makedirs(mirrors_dir_path, exist_ok=True)
-    mirror_name = "parabolicM2"
+    mirror_name = "parabolicPFL0.5RFL90"
 
     bord = 0  # borders
     steps = 2
@@ -15,12 +15,12 @@ if __name__ == "__main__":
     x_step = steps
     y_step = steps
 
-    RFL = 110  # Reflective Focal Length
+    RFL = 90  # Reflective Focal Length
     PFL = 0.5 * RFL  # Parent Focal Length
 
     x_length = 48 + 2 * bord * x_step
     y_length = 48 + 2 * bord * y_step
-    x_offaxis = RFL
+    x_offaxis = 40
     y_offaxis = 0
 
     ka = 0.25 / PFL

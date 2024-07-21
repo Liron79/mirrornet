@@ -4,9 +4,9 @@ import os
 import matplotlib.pyplot as plt
 from PhysicalScripts.helper import spline_mirror
 
-mirror_key = "d9f4223526"
+mirror_key = "4db35d4dfd"
 mirror_name = "mirror.pt"
-mirror_title = "Estimated Parabolic"
+mirror_title = f"Estimated_Mirror_Parabolic_{mirror_key}"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 mirror_dir_path = os.path.join(base_dir, "Mirrors")
@@ -22,9 +22,13 @@ ax1 = fig.add_subplot(111, projection='3d')
 
 ax1.plot_surface(X, Y, Z, color="green", alpha=0.5, label="b")
 ax1.set_xlabel('X')
+ax1.set_xlim(0, 100)
 ax1.set_ylabel('Y')
+ax1.set_ylim(-24, 24)
 ax1.set_zlabel('Z')
+ax1.set_zlim(0, 70)
 ax1.set_title(mirror_title)
+ax1.view_init(10, -85)
 if show:
     plt.show()
 else:

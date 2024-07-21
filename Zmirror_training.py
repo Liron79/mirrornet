@@ -20,8 +20,8 @@ data_list = load_json("training_cfg.json")["training_paths"]
 data_list = [os.path.join(dir_path, p) for p in data_list]
 
 batch_size = 64
-epochs = 100
-lr = 0.001
+epochs = 200
+lr = 0.01
 checkpoint_rate = 20
 
 
@@ -52,13 +52,16 @@ if __name__ == "__main__":
     model.apply(init_weights)
     model = model.train()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    scheduler = lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=11 * 11 * epochs)
+    scheduler = lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=epochs)
     final_X = None
     final_Y = None
     for e in range(epochs):
         batch_loss = list()
-        for (R, M) in iter(dataloader):
-            Zo = cuda(model(cuda(R)))
+        for (R, Ri, Ro, _, M) in iter(dataloader):
+            Ri = cuda(Ri[:, :3])
+            Ro = cuda(Ro[:, :3])
+            R_ = torch.cat((Ri, Ro), dim=1).float()
+            Zo = cuda(model(cuda(R_)))
             Z = cuda(M[2])
             final_X = M[0].numpy()[0]
             final_Y = M[1].numpy()[0]

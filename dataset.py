@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 import pandas as pd
 from typing import Optional
 from torch.utils.data import Dataset
@@ -39,11 +40,13 @@ class PhysicalDataset(Dataset):
         My = torch.cat([torch.tensor(My).float() for (_, My, _) in M], dim=0)
         Mz = torch.cat([torch.tensor(Mz).float() for (_, _, Mz) in M], dim=0)
         M = (Mx, My, Mz)
-        sep = len(self.data.columns[1:]) // 2
-        Ri = torch.from_numpy(self.data[self.data.columns[1:sep + 1]].values)
-        Ri = Ri[:, :3] # x, y, z, kx, ky, kz
-        Ro = torch.from_numpy(self.data[self.data.columns[sep + 1:]].values)
-        Ro = Ro[:, :3] # x, y, z, kx, ky, kz
-        R = torch.cat((Ri, Ro), dim=1).float()[item]
-        return R, M
+        sep = len(self.data.columns[1:]) // 3
+        data = self.data.iloc[item].to_frame().T
+        Ri = torch.from_numpy(data[data.columns[1:sep + 1]].values.astype(np.float32))[0, ...]
+        # Ri = Ri[:, :3] # x, y, z, kx, ky, kz
+        Ro = torch.from_numpy(data[data.columns[sep + 1:sep*2 + 1]].values.astype(np.float32))[0, ...]
+        # Ro = Ro[:, :3] # x, y, z, kx, ky, kz
+        Rint = torch.from_numpy(data[data.columns[sep*2 + 1:]].values.astype(np.float32))[0, ...]
+        R = torch.cat((Ri, Ro, Rint), dim=0).float()
+        return R, Ri, Ro, Rint, M
 

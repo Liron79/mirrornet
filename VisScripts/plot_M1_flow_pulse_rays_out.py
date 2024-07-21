@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 
 pulse_name = "customized_centered_rays_parabolic"
-pulse_title = "Parabolic Focus Point Projection"
+pulse_title = "customized_centered_rays_parabolic"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 pulse_dir_path = os.path.join(base_dir, "PhysicalData")
@@ -24,27 +24,36 @@ BY = ["Ro_y", "Ro_z"]
 AMP_name = "Ro_amp"
 
 df = pd.read_csv(pulse_path)
+df = df[(abs(df.Ro_y) <= 5)&(15 <= df.Ro_z)&(df.Ro_z <= 25)]
 print(f"Number of samples: {df.shape[0]}")
 print(f"Number of samples after filtering: {df.shape[0]}")
-pad_factor = 1
-X_max = int(df[BY[0]].max() + 1)
-X_min = int(df[BY[0]].min() - 1)
-X_range = list(np.arange(X_min - pad_factor, X_max + pad_factor, 1))
-Y_max = int(df[BY[1]].max() + 1)
-Y_min = int(df[BY[1]].min() - 1)
-Y_range = list(np.arange(Y_min - pad_factor, Y_max + pad_factor, 1))
+X_max = round(df[BY[0]].max())
+X_min = round(df[BY[0]].min())
+X_range = list(np.arange(X_min, X_max + 1, 1))
+Y_max = round(df[BY[1]].max())
+Y_min = round(df[BY[1]].min())
+Y_range = list(np.arange(Y_min, Y_max + 1, 1))
 Z_AMP = np.zeros((len(X_range), len(Y_range)))
-map_y = {x: i for i, x in enumerate(X_range)}
-map_z = {y: j for j, y in enumerate(Y_range)}
+map_y = {round(x): i for i, x in enumerate(X_range)}
+map_z = {round(y): j for j, y in enumerate(Y_range)}
+print("map_y:", map_y)
+print("map_y:", map_z)
+is_inrange = lambda y, z: -1 <= y <= 1 and 19 <= z <= 21
 for name, grp in df.groupby(by=BY):
     y, z = name
-    if y > abs(max(map_y.keys())) or z > abs(max(map_z.keys())):
-        continue
-    Z_AMP[map_y[int(y)], map_z[int(z)]] = grp[AMP_name].sum()
+    y = round(y)
+    z = round(z)
+    if is_inrange(y, z):
+        if y > abs(max(map_y.keys())) or z > abs(max(map_z.keys())):
+            continue
+        new_y = map_y[y]
+        new_z = map_z[z]
+        amp = grp[AMP_name].mean()
+        Z_AMP[new_y, new_z] += amp
 
 X, Y = np.meshgrid(X_range, Y_range)
 ax = plt.axes(projection='3d')
-ax.plot_surface(X, Y, Z_AMP.T * 1e6, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+ax.plot_surface(X, Y, Z_AMP.T, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
 ax.set_xlabel(XAXIS_label, fontsize=10, weight='semibold')
 ax.set_ylabel(YAXIS_label, fontsize=10, weight='semibold')
 ax.set_zlabel(ZAXIS_label, fontsize=10, weight='semibold')
