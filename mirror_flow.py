@@ -6,18 +6,18 @@ from PhysicalScripts import RTR_MT_M1_XY_input, RTR_MT_M2_YZ_input
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
-# M1_dir = os.path.join(base_dir, "MirrorModels", "<MirrorModel name>")
-# M1_key = os.path.basename(M1_dir)
-# M1_name = "mirror.pt"
+M1_dir = os.path.join(base_dir, "MirrorModels", "275172cbff")
+M1_key = os.path.basename(M1_dir)
+M1_name = "mirror"
 
-M1_dir = os.path.join(base_dir, "PhysicalMirrors")
-M1_key = str()
-M1_name = "<PhysicalModel filename>"
+# M1_dir = os.path.join(base_dir, "PhysicalMirrors")
+# M1_key = str()
+# M1_name = "parabolicPFL0.5RFL38"
 
 M2_run = False
 M2_name = "parabolic.pt"
 
-rays_path = os.path.join(base_dir, "Storage", "RaysIn", "<RaysIn filename input .csv>")
+rays_path = os.path.join(base_dir, "Storage", "RaysIn", "customized_rays_full.csv")
 
 physical_data_dir = os.path.join(base_dir, "Storage", "PhysicalData")
 os.makedirs(physical_data_dir, exist_ok=True)

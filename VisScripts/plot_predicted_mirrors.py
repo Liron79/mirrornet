@@ -4,9 +4,9 @@ import os
 import matplotlib.pyplot as plt
 from PhysicalScripts.helper import spline_mirror
 
-mirror_key = "<MirrorModel filename>"
+mirror_key = "275172cbff"
 mirror_name = "mirror.pt"
-mirror_title = f"Estimated_Mirror_Parabolic_{mirror_key}"
+mirror_title = f"Generated Mirror #{mirror_key} - Validation"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 mirror_dir_path = os.path.join(base_dir, "MirrorModels")

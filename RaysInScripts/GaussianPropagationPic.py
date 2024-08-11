@@ -17,7 +17,7 @@ import matplotlib
 # matplotlib.use("Agg")
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-gaussian_dir_path = os.path.join(base_dir, "RaysIn")
+gaussian_dir_path = os.path.join(base_dir, "Storage", "RaysIn")
 os.makedirs(gaussian_dir_path, exist_ok=True)
 
 
@@ -421,7 +421,7 @@ fyp = np.fft.fftshift(np.fft.fftfreq(Kyp.shape[0], Ky[1] - Ky[0]))
 raveledfxp, raveledfyp, raveledWigX0Y0p = np.ravel(fxp), np.ravel(fyp), np.ravel(WigX0Y0p)
 X, Y = np.meshgrid(fxp, fyp)
 
-pulse_file_path = os.path.join(gaussian_dir_path, f"gaussian_22x22_sig2_non_par.csv")
+pulse_file_path = os.path.join(gaussian_dir_path, f"mode1.csv")
 with open(pulse_file_path, "w+", newline="") as f:
     columns = ["x", "y", "z", "kx", "ky", "kz", "ex", "ey", "ez", "distance", "amp", "status", "ray_index"]
     csv_writer = csv.writer(f, delimiter=",")

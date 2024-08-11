@@ -35,8 +35,8 @@ class ZMirrorModel(nn.Module):
     def __init__(self: 'ZMirrorModel', in_features: int = 6, out_features: int = 625):
         super(ZMirrorModel, self).__init__()
         self.relu = nn.ReLU(inplace=True)
-        self.fc1 = nn.Linear(in_features, 10, bias=True)
-        self.fc2 = nn.Linear(10, out_features, bias=True)
+        self.fc1 = nn.Linear(in_features, 100, bias=True)
+        self.fc2 = nn.Linear(100, out_features, bias=True)
 
     def forward(self: 'ZMirrorModel', R: torch.Tensor) -> tuple:
         # R = [3 parameters of Ri, 3 parameters of Ro] -> M = [625]

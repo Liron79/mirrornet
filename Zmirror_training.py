@@ -13,7 +13,7 @@ from models import ZMirrorLoss, ZMirrorModel, Zmirror_prediction
 
 batch_size = 64
 epochs = 200
-lr = 0.01
+lr = 0.001
 checkpoint_rate = 20
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -37,7 +37,9 @@ if __name__ == "__main__":
         "input_paths": data_list,
         "batch_size": batch_size,
         "lr_start": lr,
-        "epochs": epochs
+        "epochs": epochs,
+        "fc1":  100,
+        "fc2":  100
     }
 
     if torch.cuda.is_available():

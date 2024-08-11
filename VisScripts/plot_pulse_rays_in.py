@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-pulse_title = "<RaysIn filename>"
-pulse_name = "<Title>"
+pulse_title = "mode1"
+pulse_name = "mode1"
 show = True
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -43,9 +43,13 @@ X, Y = np.meshgrid(X_range, Y_range)
 ax = plt.axes(projection='3d')
 ax.plot_surface(X, Y, Z_AMP.T * 1e6, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
 ax.set_xlabel(XAXIS_label, fontsize=10, weight='semibold')
+# ax.set_xlim(0, 50)
 ax.set_ylabel(YAXIS_label, fontsize=10, weight='semibold')
+# ax.set_ylim(-24, 24)
 ax.set_zlabel(ZAXIS_label, fontsize=10, weight='semibold')
+# ax.set_zlim(0, 50)
 ax.set_title(pulse_title)
+# ax.view_init(10, -85)
 if show:
     plt.show()
 else:
