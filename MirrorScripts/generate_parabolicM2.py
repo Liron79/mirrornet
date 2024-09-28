@@ -5,7 +5,7 @@ import os
 
 if __name__ == "__main__":
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    mirrors_dir_path = os.path.join(base_dir, "Mirrors")
+    mirrors_dir_path = os.path.join(base_dir, "PhysicalMirrors")
     os.makedirs(mirrors_dir_path, exist_ok=True)
 
     bord = 0  # borders
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     y_step = steps
 
     PFL_factor = 0.5
-    RFL = 78  # Reflective Focal Length
+    RFL = 40  # Reflective Focal Length
     PFL = PFL_factor * RFL  # Parent Focal Length
 
     mirror_name = f"parabolicPFL{PFL_factor}RFL{RFL}"

@@ -1,25 +1,11 @@
 import torch
-import numpy as np
 from torch import nn
-from torch.utils.data import DataLoader
-from utils import cuda
-
-
-def Zmirror_prediction(model: nn.Module, dataloader: DataLoader) -> np.array:
-    final_z = list()
-    for (R, Ri, Ro, _, M) in iter(dataloader):
-        with torch.no_grad():
-            Ri = cuda(Ri[:, :3])
-            Ro = cuda(Ro[:, :3])
-            R_ = torch.cat((Ri, Ro), dim=1).float()
-            z = model(cuda(R_))
-            final_z.append(z.detach().cpu())
-    final_z = torch.cat(final_z, dim=0).mean(axis=0)
-
-    return final_z.numpy()
 
 
 class ZMirrorLoss(nn.Module):
+    """
+    Generalizes loss concept between mirrors.
+    """
     def __init__(self: 'ZMirrorLoss', reduction: str = "mean") -> None:
         super(ZMirrorLoss, self).__init__()
         self.reduction = reduction
@@ -32,16 +18,27 @@ class ZMirrorLoss(nn.Module):
 
 
 class ZMirrorModel(nn.Module):
-    def __init__(self: 'ZMirrorModel', in_features: int = 6, out_features: int = 625):
+    """
+    Neural network model which takes [Ri;Ro] and returns M (new mirror).
+    """
+    def __init__(self: 'ZMirrorModel', in_features: int = 400, out_features: int = 625):
         super(ZMirrorModel, self).__init__()
-        self.relu = nn.ReLU(inplace=True)
-        self.fc1 = nn.Linear(in_features, 100, bias=True)
-        self.fc2 = nn.Linear(100, out_features, bias=True)
+        self.act = nn.SiLU(inplace=True)
+        self.fc1 = nn.Linear(in_features, 450, bias=True)
+        self.fc2 = nn.Linear(450, 500, bias=True)
+        self.fc3 = nn.Linear(500, 550, bias=True)
+        self.fc4 = nn.Linear(550, 600, bias=True)
+        self.fc5 = nn.Linear(600, out_features, bias=True)
 
     def forward(self: 'ZMirrorModel', R: torch.Tensor) -> tuple:
-        # R = [3 parameters of Ri, 3 parameters of Ro] -> M = [625]
         Mo = self.fc1(R)
-        Mo = self.relu(Mo)
-        z = self.fc2(Mo)
+        Mo = self.act(Mo)
+        Mo = self.fc2(Mo)
+        Mo = self.act(Mo)
+        Mo = self.fc3(Mo)
+        Mo = self.act(Mo)
+        Mo = self.fc4(Mo)
+        Mo = self.act(Mo)
+        z = self.fc5(Mo)
 
         return z

@@ -51,5 +51,6 @@ if show:
     plt.show()
 else:
     plt.savefig(output_path)
+
 print(f"Results directory: {output_path}")
 print("Done!")

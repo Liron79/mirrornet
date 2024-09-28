@@ -1,49 +1,42 @@
+import glob
+import os
 import torch
 import numpy as np
-import pandas as pd
 from typing import Optional
 from torch.utils.data import Dataset
 from utils import gen_hash
 
 
-def cell_sampling(data: pd.DataFrame, cell_resolution: int) -> pd.DataFrame:
-    if data.empty:
-        raise ValueError("Data is Empty.")
-    sampled_data = list()
-    for name, grp in data.groupby(by=["M", "Ri_x", "Ri_y", "Ri_z"]):
-        # Parallel rays approach
-        sampled_grp = grp.sort_values(by=["Ri_kx", "Ri_ky", "Ri_kz"], key=abs).reset_index(drop=True)
-        # parael_rays_cond = (sampled_grp.Ri_kx == 0.0) & (sampled_grp.Ri_ky == 0.0) & (sampled_grp.Ri_kz == -1.0)
-        # sampled_grp = sampled_grp[parael_rays_cond]
-        sampled_grp = sampled_grp.iloc[:cell_resolution]
-        sampled_data.append(sampled_grp)
-    return pd.concat(sampled_data, axis=0)
-
-
-class PhysicalDataset(Dataset):
-
-    def __init__(self: 'PhysicalDataset', paths: list, name: Optional[str] = None, n_rows: Optional[int] = None, cell_resolution: int = 1) -> None:
+class RaysDataset(Dataset):
+    """
+    Class captures an entire ray onto a fixed grid.
+    Each iteration returns a grid of rays.
+    """
+    def __init__(self: 'RaysDataset', root_path: Optional[str] = None, name: Optional[str] = None) -> None:
         self.name = gen_hash() if name is None else name
-        self.paths = paths
-        self.cell_resolution = cell_resolution
-        self.data = pd.concat([pd.read_csv(path, nrows=n_rows) for path in paths], axis=0).reset_index(drop=True)
-        if self.data.empty:
+        self.root_path = root_path
+        mirror_dirs = list(set(glob.glob(os.path.join(self.root_path, "*"))))
+        self.data = []
+        for mirror_dir in mirror_dirs:
+            if os.path.isdir(mirror_dir):
+                # 1. reading mirror
+                with open(os.path.join(mirror_dir, "mirror.txt")) as f:
+                    mirror = torch.load(f.read())
+                input_dir_path = os.path.join(mirror_dir, "inputs")
+                output_dir_path = os.path.join(mirror_dir, "outputs")
+                # 2. loading any input-output pairs
+                for i in range(len(os.listdir(input_dir_path))):
+                    file_in = torch.from_numpy(np.load(os.path.join(input_dir_path, f"{i}.npy")))
+                    file_out = torch.from_numpy(np.load(os.path.join(output_dir_path, f"{i}.npy")))
+                    data = torch.concat((file_in, file_out), dim=2).permute(2, 0, 1)
+                    self.data.append((os.path.basename(mirror_dir), mirror, data, i))
+                    # break
+
+        if len(self.data) == 0:
             raise ValueError("dataset is empty.")
 
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self: 'PhysicalDataset', item: torch.Tensor) -> [tuple, tuple]:
-        M = [torch.load(M_path) for M_path in [self.data.M.iloc[item]]]
-        Mx = torch.cat([torch.tensor(Mx).float() for (Mx, _, _) in M], dim=0)
-        My = torch.cat([torch.tensor(My).float() for (_, My, _) in M], dim=0)
-        Mz = torch.cat([torch.tensor(Mz).float() for (_, _, Mz) in M], dim=0)
-        M = (Mx, My, Mz)
-        sep = len(self.data.columns[1:]) // 3
-        data = self.data.iloc[item].to_frame().T
-        Ri = torch.from_numpy(data[data.columns[1:sep + 1]].values.astype(np.float32))[0, ...]
-        Ro = torch.from_numpy(data[data.columns[sep + 1:sep*2 + 1]].values.astype(np.float32))[0, ...]
-        Rint = torch.from_numpy(data[data.columns[sep*2 + 1:]].values.astype(np.float32))[0, ...]
-        R = torch.cat((Ri, Ro, Rint), dim=0).float()
-        return R, Ri, Ro, Rint, M
-
+    def __getitem__(self: 'RaysDataset', item: torch.Tensor) -> [tuple, tuple]:
+        return self.data[item]

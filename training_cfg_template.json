@@ -1,7 +1,0 @@
-{
-  "training_paths": [
-    "<PhysicalData filename [1]>",
-    "<...>",
-    "<PhysicalData filename [n]>"
-  ]
-}
