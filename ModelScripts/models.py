@@ -9,8 +9,7 @@ class ZMirrorLoss(nn.Module):
     def __init__(self: 'ZMirrorLoss', reduction: str = "mean") -> None:
         super(ZMirrorLoss, self).__init__()
         self.reduction = reduction
-        # self.loss_fn = nn.MSELoss(reduction=reduction)
-        self.loss_fn = nn.L1Loss(reduction=reduction)
+        self.loss_fn = nn.MSELoss(reduction=reduction)
 
     def forward(self: 'ZMirrorLoss', Mo: torch.Tensor, M: torch.Tensor) -> torch.Tensor:
         Lz = self.loss_fn(Mo, M)
