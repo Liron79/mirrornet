@@ -1,0 +1,15 @@
+{
+  "M1_name_list": [
+  ],
+  "M1_dir_out": "<prediction output dir name>",
+  "rays_data_path": "<rays data file path>",
+  "rays_input_boundaries": {
+    "rand_img_count": 500,
+    "x_dim": 49,
+    "x_shift": 15,
+    "y_dim": 49,
+    "y_shift": 0,
+    "yo_dim": 21,
+    "zo_dim": 41
+  }
+}

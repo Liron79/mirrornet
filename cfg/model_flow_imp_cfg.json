@@ -1,0 +1,25 @@
+{
+  "data_ref": "<gaussian matrix>.npy",
+  "gt_ref": "<gt output rays file name>",
+  "data_name": "<data file path to have a comparison>",
+  "data_dir": "<data dir name to have the comparison>",
+  "y_dim": 21,
+  "z_dim": 41,
+  "rays_data_results_path": "<predicted rays output data file path>",
+  "gaussian_settings": {
+      "height": 21,
+      "width":  41,
+      "means": [[21, 21], [10, 10]],
+      "sigmas": [3, 6, 9]
+  },
+  "rays_input_boundaries": {
+    "rand_img_count": 500,
+    "x_dim": 49,
+    "x_shift": 15,
+    "y_dim": 49,
+    "y_shift": 0,
+    "yo_dim": 21,
+    "zo_dim": 41
+  },
+  "base_physical_mirror": "<some existing physical mirror to use its X,Y values>.pt"
+}

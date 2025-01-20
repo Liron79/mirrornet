@@ -1,44 +1,52 @@
 import torch
 import os
 import json
+import tempfile
+import shutil
 import pandas as pd
 import numpy as np
-from utils import cuda, current_time, init_weights
-from dataset import RaysDataset
+from utils import cuda, current_time, init_weights, load_json
+from ModelScripts.dataset import RaysDataset
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
-from models import ZMirrorLoss, ZMirrorModel
+from ModelScripts.models import ZMirrorLoss, ZMirrorModel
 
 # python -m pip install torch --index-url https://download.pytorch.org/whl/cu121
-
-batch_size = 64
-epochs = 400
-lr = 0.0005
-checkpoint_rate = 100
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 mirrors_dir = os.path.join(base_dir, "MirrorModels")
 os.makedirs(mirrors_dir, exist_ok=True)
 
 dir_path = os.path.join(base_dir, "Storage", "PhysicalData")
-dataset_path = os.path.join(dir_path, "RaysMatrix", "train")
+
+inputs = load_json("cfg/Zmirror_training_cfg.json")
+dataset_path = os.path.join(dir_path, inputs['train_dir'])
+batch_size = inputs['batch_size']
+epochs = inputs['epochs']
+lr = inputs['lr']
+checkpoint_rate = inputs['checkpoint_rate']
 
 
 if __name__ == "__main__":
     dt_object = current_time()
-    date = dt_object.strftime('%Y_%m_%d')
-    time = dt_object.strftime('%H_%M_%S')
+    date = dt_object.strftime('%Y%m%d')
+    time = dt_object.strftime('%H%M')
     print(f"Mirror Flow Start Time = {dt_object}")
 
-    # mirror_dir = os.path.join(mirrors_dir, dataset.name)
     mirror_dir = os.path.join(mirrors_dir, date + "_" + time)
     os.makedirs(mirror_dir, exist_ok=True)
 
-    # 1. load Data from PhysicalData directory
     dataset = RaysDataset(root_path=dataset_path)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
+    dataloader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=0,
+        pin_memory=True
+    )
 
     metadata = {
+        "training_paths": dataset.mirror_dirs,
         "batch_size": batch_size,
         "lr_start": lr,
         "epochs": epochs
@@ -49,20 +57,26 @@ if __name__ == "__main__":
     else:
         print("Training a model with CPU")
 
-    # 2. train a mirror model from the Data
     loss_fn = cuda(ZMirrorLoss())
     epoch_stdev = np.zeros(epochs)
     epoch_loss = np.zeros(epochs)
-    model = cuda(ZMirrorModel(in_features=24576))
+    model = cuda(ZMirrorModel(
+        in_features=inputs['in_features'],
+        in_output_features=inputs['in_output_features']
+    ))
     model.apply(init_weights)
     model = model.train()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     scheduler = lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=epochs)
+    tmp_dir = tempfile.mkdtemp()
+    models_map = dict()
     for e in range(epochs):
         batch_stdev = list()
         batch_loss = list()
-        for _, M, data, i in iter(dataloader):
-            Zo = cuda(model(cuda(torch.flatten(data, start_dim=1).float())))[0, ...]
+        for (_, M, data), out in iter(dataloader):
+            R = cuda(torch.flatten(data, start_dim=1).float())
+            O = cuda(torch.flatten(out, start_dim=1).float())
+            Zo = cuda(model(R=R, O=O))[0, ...]
             Z = M[2].float()[0, ...]
             loss = loss_fn(Zo, Z)
             optimizer.zero_grad()
@@ -76,13 +90,17 @@ if __name__ == "__main__":
         lr = scheduler.get_last_lr()[0]
         epoch_stdev[e] = np.mean(batch_stdev)
         epoch_loss[e] = np.mean(batch_loss)
-        if e % 5 == 0:
+        if e % 5 == 0 or e == (epochs - 1):
+            temp_file = os.path.join(tmp_dir, f"{e}.pt")
+            torch.save(model, temp_file)
+            models_map[e] = (temp_file, epoch_loss[e])
             print(f"Epoch={e}/{epochs},{lr=},{epoch_loss[e]=},{epoch_stdev[e]=}")
 
-        # if e % checkpoint_rate == 0:
-        #     checkpoint_path = os.path.join(mirrors_dir, mirror_dir, "checkpoint", f"{e}")
-        #     os.makedirs(checkpoint_path, exist_ok=True)
-        #     torch.save(model.eval().cpu(), os.path.join(checkpoint_path, "model.pt"))
+    min_epoch_index = min(models_map, key=lambda k: models_map[k][-1])
+    print(f"Found @ Epoch {min_epoch_index}")
+    model_path, _ = models_map[min_epoch_index]
+    model = torch.load(model_path)
+    shutil.rmtree(tmp_dir)
 
     metadata["lr_end"] = lr
 

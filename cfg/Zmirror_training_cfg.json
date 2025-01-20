@@ -1,0 +1,9 @@
+{
+  "train_dir": "<training dir name>",
+  "in_features": 2401,
+  "in_output_features": 861,
+  "batch_size": 32,
+  "epochs": 250,
+  "lr": 0.01,
+  "checkpoint_rate": 10
+}

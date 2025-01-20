@@ -8,7 +8,7 @@ fx = 5
 x = np.arange(-5, 5, 1 / fx)
 y = x
 # y = np.arange(-10, 12, 1)
-sigma = 0.1  # $\sigma$ of the gaussian
+sigma = 1  # $\sigma$ of the gaussian
 variance = sigma ** 2
 X, Y = np.meshgrid(x, y)
 G = 1 / (np.sqrt(2 * np.pi * variance)) * (np.exp(-X ** 2 / (2 * variance) - Y ** 2 / (2 * variance)))  # gaussian input signal
@@ -22,14 +22,14 @@ ax.set_ylabel('y')
 ax.set_xlabel('x')
 plt.show()
 
-ax = plt.axes(projection='3d')
-Kx, Ky = X, Y
-fft_G = np.fft.fftshift(np.fft.fft2(G2))
-fx = np.fft.fftshift(np.fft.fftfreq(Kx.shape[0], Kx[1] - Kx[0]))
-fy = np.fft.fftshift(np.fft.fftfreq(Ky.shape[0], Ky[1] - Ky[0]))
-ax.plot_surface(Kx, Ky, abs(fft_G), rstride=1, cstride=1, cmap='viridis', edgecolor='none')
-ax.plot_surface(Kx, Ky, abs(np.fft.fft2(G2)), rstride=1, cstride=1, cmap='viridis', edgecolor='none')
-plt.show()
+# ax = plt.axes(projection='3d')
+# Kx, Ky = X, Y
+# fft_G = np.fft.fftshift(np.fft.fft2(G2))
+# fx = np.fft.fftshift(np.fft.fftfreq(Kx.shape[0], Kx[1] - Kx[0]))
+# fy = np.fft.fftshift(np.fft.fftfreq(Ky.shape[0], Ky[1] - Ky[0]))
+# ax.plot_surface(Kx, Ky, abs(fft_G), rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+# ax.plot_surface(Kx, Ky, abs(np.fft.fft2(G2)), rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+# plt.show()
 # fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize = (5,8))
 # # subplots_adjust(hspace=0.75)
 #
@@ -79,4 +79,4 @@ ax2.set_ylabel('|X(f)|')
 ax2.set_xlim(-10, 10)
 ax2.legend()
 
-plt.show()
+# plt.show()

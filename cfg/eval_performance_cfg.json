@@ -1,0 +1,7 @@
+{
+  "M_ref": "<mirror name>",
+  "M_pred": "<predicted mirror name>",
+  "ref_directory": "<physical data M0 dir name>",
+  "pred_directory": "<predicted data dir name>",
+  "data_basic_filename": "<basic rays data file name>"
+}

@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-pulse_name = "<PhysicalData filename>"
-pulse_title = "<Title>"
+pulse_name = "<physical data filename>"
+pulse_title = "<physical data filename>"
 show = True
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

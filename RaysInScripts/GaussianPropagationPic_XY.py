@@ -436,8 +436,8 @@ with open(pulse_file_path, "w+", newline="") as f:
             fft_Et_ij = np.abs(WigF[t])
             for kx in range(Nx * 2):
                 for ky in range(Ny * 2):
-                    if X[kx, ky] == 0 and Y[kx, ky] == 0: # par
+                    # if X[kx, ky] == 0 and Y[kx, ky] == 0: # par
                     # if X[kx, ky] != 0 and Y[kx, ky] != 0: # non-par
-                        Ri = [i, j, Z_const, X[kx, ky], Y[kx, ky], -1, 1, 0, 0, 0, fft_Et_ij[ti, tj], 0, idx]
-                        idx += 1
-                        csv_writer.writerow(Ri)
+                    Ri = [i, j, Z_const, X[kx, ky], Y[kx, ky], -1, 1, 0, 0, 0, fft_Et_ij[ti, tj], 0, idx]
+                    idx += 1
+                    csv_writer.writerow(Ri)

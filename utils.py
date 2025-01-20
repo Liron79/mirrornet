@@ -6,7 +6,7 @@ import json
 import numpy as np
 import pandas as pd
 import torch.cuda
-from typing import Tuple
+from typing import Tuple, Optional
 from torch import nn
 from datetime import datetime
 
@@ -108,54 +108,74 @@ def minmax_norm(t, a, b, t_max, t_min):
     return a + (((t - t_min) * (b - a)) / (t_max - t_min))
 
 
-def generate_rays_dataset(Ri: list, Ro: list,
+def generate_rays_dataset(Ri: list,
                           x_dim: int, y_dim: int,
-                          xi_min: int, xi_max: int,
-                          yi_min: int, yi_max: int):
-    R = dict()
-    for ri, ro in zip(Ri, Ro):
-        xi, yi, _, kxi, kyi, _, _, _, _, _, _, _, _ = ri
-        _, _, _, _, kyo, kzo, _, _, _, _, _, _, _ = ro
+                          x_shift: int, y_shift: int,
+                          rand_img_count: int = 1,
+                          Ro: Optional[list] = None,
+                          yo_dim: int = 0, zo_dim: int = 0,
+                          par_mode: bool = False):
+    if Ro is None:
+        Ro = np.copy(Ri)
+        yo_dim = x_dim
+        zo_dim = y_dim
 
-        xi = minmax_norm(xi, 0, x_dim - 1, xi_max, xi_min)
+    R = dict()
+    max_yo = max_zo = 0
+    min_yo = min_zo = np.inf
+    for ri, ro in zip(Ri, Ro):
+        xi = ri[0]
+        yi = ri[1]
+        amp = ri[-3]
+        yo = ro[1]
+        zo = ro[2]
+
         xi = int(xi)
-        yi = minmax_norm(yi, 0, y_dim - 1, yi_max, yi_min)
+        yi = yi + y_dim // 2
         yi = int(yi)
 
+        if yo > max_yo:
+            max_yo = yo
+        if yo < min_yo:
+            min_yo = yo
+        if zo > max_zo:
+            max_zo = zo
+        if zo < min_zo:
+            min_zo = zo
+
         idx = (xi, yi)
-        values = (kxi, kyi, kyo, kzo)
+        values = (amp, yo, zo)
         if idx not in R:
             R[idx] = [values]
         else:
             R[idx].append(values)
 
-    max_len = 30
     for idx in R:
         R[idx] = sorted(R[idx], key=lambda pair: (pair[0] ** 2 + pair[1] ** 2) ** 0.5)
-        # max_len = max(max_len, len(R[idx]))
-    print(f"max_len =  {max_len}")
+    print(f"Maximum Rays per Cell: {rand_img_count}")
 
     R_input = list()
     R_output = list()
-    par_mode = True
-    for _ in range(max_len):
-        Ri_kx_mat = np.ones((x_dim, y_dim, 1))
-        Ri_ky_mat = np.ones((x_dim, y_dim, 1))
-        Ro_ky_mat = np.ones((x_dim, y_dim, 1))
-        Ro_kz_mat = np.ones((x_dim, y_dim, 1))
+    for _ in range(rand_img_count):
+        Ro_amp_mat = np.zeros((yo_dim, zo_dim, 1))
+        Ri_amp_mat = np.zeros((x_dim, y_dim, 1))
         for idx in R:
             x, y = idx
             j = 0 if par_mode else random.randint(0, len(R[idx]) - 1)
-            kxi, kyi, kyo, kzo = R[idx][j]
+            amp, yo, zo = R[idx][j]
 
-            Ri_kx_mat[x, y] = kxi
-            Ri_ky_mat[x, y] = kyi
-            Ro_ky_mat[x, y] = kyo
-            Ro_kz_mat[x, y] = kzo
+            yo = int(yo)
+            yo = yo + yo_dim // 2
+            zo = int(zo)
+
+            if yo >= yo_dim or zo >= zo_dim or yo < 0 or zo < 0:
+                continue
+            Ro_amp_mat[yo, zo] = amp
+            Ri_amp_mat[x - x_shift - 1, y - y_shift - 1] = amp
 
         par_mode = False
-        R_input.append(np.concatenate((Ri_kx_mat, Ri_ky_mat), axis=2))
-        R_output.append(np.concatenate((Ro_ky_mat, Ro_kz_mat), axis=2))
+        R_input.append(Ri_amp_mat)
+        R_output.append(Ro_amp_mat)
 
     return R_input, R_output
 
@@ -176,5 +196,4 @@ def transform(Ro: list, kind: str = "linear") -> list:
 def init_weights(m):
     if isinstance(m, nn.Linear):
         torch.nn.init.xavier_uniform_(m.weight)
-        # torch.nn.init.kaiming_uniform_(m.weight)
         m.bias.data.fill_(0.01)

@@ -302,7 +302,7 @@ WigKx0Ky0p = np.zeros((Nx, Ny), dtype=complex)
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 dir_path = os.path.join(base_dir, "Storage", "RaysIn")
 os.makedirs(dir_path, exist_ok=True)
-angle_thresh = 0.05
+angle_thresh = 0.0001
 output_file_path = os.path.join(dir_path, f"super_comp_3gauss_thresh{angle_thresh}.csv")
 with open(output_file_path, "w+", newline="") as f:
     columns = ["x", "y", "z", "kx", "ky", "kz", "ex", "ey", "ez", "distance", "amp", "status", "ray_index"]
@@ -320,6 +320,7 @@ with open(output_file_path, "w+", newline="") as f:
                         E_shift[i, j, m + Nx, n + Ny] = E[i + m, j + n] * np.conj(E[i - m, j - n])
 
             Exij = E_shift
+            print(f"{Exij.shape=}")
             fft_Et = np.fft.fftshift(np.fft.fft2(Exij[i, j]))
             Maxvalue = fft_Et.max()
             Maxvalue = np.abs(fft_Et).max()
@@ -335,6 +336,7 @@ with open(output_file_path, "w+", newline="") as f:
             Ky_normalized = Ky / K
             fx = np.fft.fftshift(np.fft.fftfreq(Kx.shape[0], Kx[1] - Kx[0]))
             fy = np.fft.fftshift(np.fft.fftfreq(Ky.shape[0], Ky[1] - Ky[0]))
+            print(f"{fx.shape=},{fy.shape=},{Kx.shape[0]=},{Kx[0]=},{Kx[1]=},{Kx[1] - Kx[0]=}")
             fx_normalized = np.fft.fftshift(np.fft.fftfreq(Kx_normalized.shape[0], Kx_normalized[1] - Kx_normalized[0]))
             fy_normalized = np.fft.fftshift(np.fft.fftfreq(Ky_normalized.shape[0], Ky_normalized[1] - Ky_normalized[0]))
 

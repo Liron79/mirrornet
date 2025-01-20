@@ -4,11 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-pulse_name = "<PhysicalData filename>"
-pulse_title = "<Title>"
+pulse_name = "<physical data name>"
+pulse_title = "<physical data name>"
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-pulse_dir_path = os.path.join(base_dir, "Storage", "PhysicalData")
+pulse_dir_path = os.path.join(base_dir, "Storage", "PhysicalData", "archive", pulse_name)
 vis_dir_path = os.path.join(base_dir, "Storage", "VisData")
 os.makedirs(vis_dir_path, exist_ok=True)
 
@@ -16,11 +16,11 @@ pulse_path = os.path.join(pulse_dir_path, f"{pulse_name}.csv")
 output_path = os.path.join(vis_dir_path, f"rays_out_{pulse_name}.png")
 show = True
 
-XAXIS_label = "Y [mm]"
-YAXIS_label = "Z [mm]"
-area = "[mVs/m]"
+XAXIS_label = "Y axis"
+YAXIS_label = "Z axis"
+# area = "[mVs/m]"
 decimals = 2
-ZAXIS_label = "|Ex| {}\u00b2".format(area, decimals)
+# ZAXIS_label = "|Ex| {}\u00b2".format(area, decimals)
 BY = ["Ro_y", "Ro_z"]
 AMP_name = "Ro_amp"
 
@@ -57,8 +57,6 @@ ax = plt.axes(projection='3d')
 ax.plot_surface(X, Y, Z_AMP.T, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
 ax.set_xlabel(XAXIS_label, fontsize=10, weight='semibold')
 ax.set_ylabel(YAXIS_label, fontsize=10, weight='semibold')
-ax.set_zlabel(ZAXIS_label, fontsize=10, weight='semibold')
-ax.set_title(pulse_title)
 if show:
     plt.show()
 else:

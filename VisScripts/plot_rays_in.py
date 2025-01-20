@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-pulse_title = "super_comp_3gauss_thresh001"
-pulse_name = "super_comp_3gauss_thresh001"
+pulse_title = "<rays data name>"
+pulse_name = "<rays data name>"
 show = True
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -18,9 +18,7 @@ output_path = os.path.join(vis_dir_path, f"rays_in_{pulse_name}.png")
 
 XAXIS_label = "X [mm]"
 YAXIS_label = "Y [mm]"
-area = "[mVs/m]"
-decimals = 2
-ZAXIS_label = "|Ex| {}\u00b2".format(area, decimals)
+ZAXIS_label = "Z"
 BY = ["x", "y"]
 AMP_name = "amp"
 
@@ -45,7 +43,6 @@ ax.plot_surface(X, Y, Z_AMP.T * 1e6, rstride=1, cstride=1, cmap='viridis', edgec
 ax.set_xlabel(XAXIS_label, fontsize=10, weight='semibold')
 ax.set_ylabel(YAXIS_label, fontsize=10, weight='semibold')
 ax.set_zlabel(ZAXIS_label, fontsize=10, weight='semibold')
-ax.set_title(pulse_title)
 if show:
     plt.show()
 else:

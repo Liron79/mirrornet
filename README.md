@@ -7,3 +7,15 @@ Here is the main system flow:
 ## Installation steps:
 1. Python version: 3.12.0
 2. Run: python -m pip install -r requirements.txt
+
+## Generate Results Recipe:
+### Manually:
+#### Settings: M, Rin
+1. Run mirror_flow with M, Rin - Ro [single run with multiple mirrors]
+2. Run Zmirror_training with Rin, Ro, M - model [single run  with many data]
+
+### Automatically:
+#### Settings: model, Rin, Ro
+1. Run model_flow_exp - M_model
+2. Run mirror_flow with M_model - generate Ro_model
+3. Run eval to generate comparisons between Ro_model to Ro

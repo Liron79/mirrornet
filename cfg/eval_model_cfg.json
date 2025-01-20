@@ -1,0 +1,9 @@
+{
+  "data_ref": "<gaussian matrix>.npy",
+  "gt_dir": "<gt M0 dir name>",
+  "gt_ref": "<gt M0 data name>",
+  "data_name": "<physical data name to have a comparison>",
+  "data_dir": "<physical data dir name to have a comparison>",
+  "y_dim": 21,
+  "z_dim": 41
+}
